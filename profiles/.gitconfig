@@ -1,0 +1,18 @@
+[rerere]
+  name = Jason Stinson
+  email = jsfeb26@gmail.com
+[alias]
+  co = checkout
+  br = branch
+  s = status
+  last = log -1 HEAD
+  r = rebase -i
+  cm = commit -m
+  cp = cherry-pick
+[user]
+  email = jsfeb26@gmail.com
+  name = Jason Stinson
+[github]
+  user = jsfeb26
+[credential]
+  helper = osxkeychain
