@@ -3,32 +3,32 @@
 1. Download [zip](https://github.com/jsfeb26/dotfiles) and put in `~/dotfiles`
 2. Run `~/dotfiles/osx-install.sh`
 
-## Install Script
-
-1. Clone dotfiles repo
-2. Homebrew/terminal/zsh/ohmyzsh
-3. Symlink .zshrc/.vimrc/.profile
-4. Install fonts
-5. OSX Productivity - Magnet/Alfred
-6. OSX Settings - Dock/Finder
-7. Web Browser - Extensions - AdBlock, Privacy Badger, OneTab, JSONViewer, Stylus, Vue Devtools, React Devtools 
-8. Node.js - nvm
-9. Code Editor - vs code
-10. Code Editor Extensions
-11. Iris
-12. iCloud sync Desktop and Documents
-
 ## Customize Settings
 
-1. Magnet Settings
-2. Alfred Settings and Snippets
-3. iTerm2 Sync Settings
-   - Preferences -> General -> Preferences
-     - Check both checkboxes and set path to `/Users/jasonstinson/dotfiles/profiles/iterm`
-
-brew cask install firefox
-brew cask install brave
-brew cask install chrome
-brew cask install magnet
-brew cask install hyperswitch
-brew cask install visual-studio-code
+1. iCloud
+   - Sync Desktop and Documents
+2. 1password
+    - Open 1password and Sign into account
+3. Dropbox
+4. Magnet Settings
+![Magnet Settings](settings/magnet-settings.png)
+5. Alfred Settings and Snippets
+6. iTerm2 Sync Settings
+    - Preferences -> General -> Preferences
+    - Check both checkboxes and set path to `/Users/jasonstinson/dotfiles/profiles/iterm`
+7. Brave
+8. Chrome
+9. hyperswitch
+10. Iris
+11. Kindle
+12. Evernote
+13. VSCode
+    - Install "Settings Sync" in VSCode
+    - In 1Password go to Github and copy token `vs-code-setting-sync-token` and gistID `vscode-sync-gist`
+    - In VSCode open command palette (`command + shift + p`) and then type `Sync: Download Settings`
+    - Enter token and gistId
+    - Restart VSCode
+14. Atom
+15. Bear
+16. Todoist
+17. Home Inventory
