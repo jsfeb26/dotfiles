@@ -32,3 +32,8 @@
 15. Bear
 16. Todoist
 17. Home Inventory
+18. Github
+    - Add SSH Key
+      - Go to https://github.com/settings/keys
+      - Click "New SSH Key"
+      - Get SSH Key by running `pbcopy < ~/.ssh/id_rsa.pub`
