@@ -68,6 +68,9 @@ brew cask install evernote
 brew cask install dropbox
 brew cask install visual-studio-code
 
+echo "Installing Atom Setting Sync"
+apm install sync-settings
+
 echo "Installing Mac App Store Package Manager and Apps"
 brew install mas
 mas install 1091189122 # Bear
