@@ -37,6 +37,18 @@
     - Enter token and gistId
     - Restart VSCode
 14. Atom
+
+    - In 1Password go to Github and copy token `atom-setting-sync-personal-token` and gistID `atom-setting-sync-gist`
+    - Edit `Config.json` by adding
+
+    ```json
+      "sync-settings":
+        gistId: "{your_gist_id}"
+        personalAccessToken: "{your_token}"
+    ```
+
+    - Open Command Palette and run `sync-settings:restore`
+
 15. Bear
     - Sign In
 16. Todoist
@@ -45,6 +57,7 @@
     - Open `iCloud Drive/Home Inventory/My_Stuff.hi3`
     - Update Backup Settings
       ![Home Inventory Settings](settings/home-inventory-settings.png)
+    - Run `dotfiles/settings/Send-to-Home-Inventory.workflow`
 18. Github
     - Add SSH Key
       - Go to [Github keys settings](https://github.com/settings/keys)
