@@ -1,7 +1,8 @@
 # Dev Setup
 
-1. Download [zip](https://github.com/jsfeb26/dotfiles) and put in `~/dotfiles`
-2. Run `~/dotfiles/osx-install.sh`
+1. Install xcode run `xcode-select --install`
+2. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
+3. Run `~/dotfiles/osx-install.sh`
 
 ## Customize Settings
 

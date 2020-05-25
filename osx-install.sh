@@ -1,40 +1,32 @@
-echo "Installing X-Code"
-xcode-select --install
+# printf "\e[42m Installing X-Code \e[0m\n"
+# xcode-select --install
 
-echo "Installing Homebrew"
+printf "\e[42m Installing Homebrew \e[0m\n"
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
 brew tap homebrew/bundle
 brew tap homebrew/cask
 brew tap homebrew/core
 
-echo "Installing Git"
+printf "\e[42m Installing Git \e[0m\n"
 brew install git
 
-echo "Install node via NVM"
+printf "\e[42m Install node via NVM \e[0m\n"
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 nvm install stable
 nvm alias default stable
 
-echo "Install Tmux"
+printf "\e[42m Install Tmux \e[0m\n"
 brew install tmux
 brew install reattach-to-user-namespace
 
-echo "Installing and setting zsh and OhMyZsh stuff"
-brew install zsh
-chsh -s /bin/zsh # make zsh default shell
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-brew install zsh-syntax-highlighting
-git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions
-npm install -g spaceship-prompt
-
-echo "Installing Docker"
+printf "\e[42m Installing Docker \e[0m\n"
 brew install docker
 brew install docker-machine
 brew cask install virtualbox
 brew install docker-compose
 
-echo "Installing Misc"
+printf "\e[42m Installing Misc \e[0m\n"
 brew install mongodb
 brew install bash-completion
 brew install diff-so-fancy
@@ -44,6 +36,7 @@ brew install hub
 brew install ack
 brew install tree
 brew install tldr
+brew install figlet
 # installing yarn with curl because brew get's latest node and I'm using nvm for that
 curl -o- -L https://yarnpkg.com/install.sh | bash
 
@@ -52,7 +45,7 @@ curl -o- -L https://yarnpkg.com/install.sh | bash
 # brew install markdown
 # brew install grep, args: ["with-default-names"]
 
-echo "Installing Programs"
+printf "\e[42m Installing Programs \e[0m\n"
 brew cask install iterm2
 brew cask install alfred
 brew cask install firefox
@@ -68,26 +61,36 @@ brew cask install evernote
 brew cask install dropbox
 brew cask install visual-studio-code
 
-echo "Installing Atom Setting Sync"
+printf "\e[42m Installing Atom Setting Sync \e[0m\n"
 apm install sync-settings
 
-echo "Installing Mac App Store Package Manager and Apps"
+printf "\e[42m Installing Mac App Store Package Manager and Apps \e[0m\n"
 brew install mas
 mas install 1091189122 # Bear
 mas install 585829637  # Todoist
 mas install 441258766  # Magnet
 mas install 413564952  # Home Inventory
 
-echo "Installing Fonts"
+printf "\e[42m Installing Fonts \e[0m\n"
 cp -R ~/dotfiles/fonts/. ~/Library/Fonts/
 
-echo "Creating dev Directory"
+printf "\e[42m Creating dev Directory \e[0m\n"
 mkdir ~/dev
 
-echo "Symlinking Profiles"
+printf "\e[42m Symlinking Profiles \e[0m\n"
 ln -s ~/dotfiles/profiles/.zshrc ~/
 ln -s ~/dotfiles/profiles/.vimrc ~/
 ln -s ~/dotfiles/profiles/.gitconfig ~/
 ln -s ~/dotfiles/profiles/.tmux.conf ~/
 ln -s ~/dotfiles/profiles/.tmux.conf.local ~/
 ln -s ~/dotfiles/profiles/iterm ~/
+
+figlet "Great Success!!!"
+
+printf "\e[42m Installing and setting zsh and OhMyZsh stuff \e[0m\n"
+brew install zsh
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+brew install zsh-syntax-highlighting
+git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions
+npm install -g spaceship-prompt
+chsh -s /bin/zsh # make zsh default shell
