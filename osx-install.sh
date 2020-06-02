@@ -1,20 +1,16 @@
-# printf "\e[42m Installing X-Code \e[0m\n"
-# xcode-select --install
-
 printf "\e[42m Installing Homebrew \e[0m\n"
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
 brew tap homebrew/bundle
 brew tap homebrew/cask
 brew tap homebrew/core
+brew tap mongodb/brew
 
 printf "\e[42m Installing Git \e[0m\n"
 brew install git
 
 printf "\e[42m Install node via NVM \e[0m\n"
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-nvm install stable
-nvm alias default stable
 
 printf "\e[42m Install Tmux \e[0m\n"
 brew install tmux
@@ -27,7 +23,7 @@ brew cask install virtualbox
 brew install docker-compose
 
 printf "\e[42m Installing Misc \e[0m\n"
-brew install mongodb
+brew install mongodb-community@4.2
 brew install bash-completion
 brew install diff-so-fancy
 brew install python
@@ -77,7 +73,17 @@ cp -R ~/dotfiles/fonts/. ~/Library/Fonts/
 printf "\e[42m Creating dev Directory \e[0m\n"
 mkdir ~/dev
 
+printf "\e[42m Installing \e[0m\n"
+brew install zsh
+
 printf "\e[42m Symlinking Profiles \e[0m\n"
+rm ~/.zshrc
+rm ~/.vimrc
+rm ~/.gitconfig
+rm ~/.tmux.conf
+rm ~/.tmux.conf.local
+rm -rf ~/iterm
+
 ln -s ~/dotfiles/profiles/.zshrc ~/
 ln -s ~/dotfiles/profiles/.vimrc ~/
 ln -s ~/dotfiles/profiles/.gitconfig ~/
@@ -87,10 +93,4 @@ ln -s ~/dotfiles/profiles/iterm ~/
 
 figlet "Great Success!!!"
 
-printf "\e[42m Installing and setting zsh and OhMyZsh stuff \e[0m\n"
-brew install zsh
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-brew install zsh-syntax-highlighting
-git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions
-npm install -g spaceship-prompt
-chsh -s /bin/zsh # make zsh default shell
+chsh -s /bin/zsh # make zsh default shell nvm install stable
