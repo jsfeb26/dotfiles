@@ -77,13 +77,13 @@ printf "\e[42m Installing \e[0m\n"
 brew install zsh
 
 printf "\e[42m Symlinking Profiles \e[0m\n"
-rm ~/.zshrc
-rm ~/.vimrc
-rm ~/.gitconfig
-rm ~/.gitconfig_global
-rm ~/.tmux.conf
-rm ~/.tmux.conf.local
-rm -rf ~/iterm
+[ ! -e ~/.zshrc ] || rm ~/.zshrc
+[ ! -e ~/.vimrc ] || rm ~/.vimrc
+[ ! -e ~/.gitconfig ] || rm ~/.gitconfig
+[ ! -e ~/.gitconfig_global ] || rm ~/.gitconfig_global
+[ ! -e ~/.tmux.conf ] || rm ~/.tmux.conf
+[ ! -e ~/.tmux.conf.local ] || rm ~/.tmux.conf.local
+[ ! -e ~/iterm ] || rm -rf ~/iterm
 
 ln -s ~/dotfiles/profiles/.zshrc ~/
 ln -s ~/dotfiles/profiles/.vimrc ~/
