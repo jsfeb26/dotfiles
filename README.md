@@ -42,9 +42,24 @@
 ### Mac Settings
 
 - Install Flipqlo Clock Screen Saver `~/dotfiles/installers/Fliqlo.dmg`
-- Install Trackball Works `~/dotfiles/installers/trackball-works.pkg`
-- Show Settings Screen shot
-- Map keys
+- Install TrackballWorks `~/dotfiles/installers/trackball-works.pkg`
+![TrackballWorks Settings](settings/trackballworks.png)
+- Keyboard Settings
+![Keyboard Settings](settings/keyboard.png)
+![Keyboard Modifier Keys Settings](settings/keyboard_modifier-keys.png)
+![Keyboard Shortcuts Settings](settings/keyboard_shortcuts.png)
+- Mouse Settings
+![Mouse Settings](settings/mouse.png)
+- Energy Saver
+![Energy Saver Settings](settings/energy-saver.png)
+- Hot Corners
+![Hot Corners Settings](settings/hot-corners.png)
+- Mission Control
+![Mission Control Settings](settings/mission-control.png)
+- General
+![General Settings](settings/general.png)
+- Dock
+![Dock Settings](settings/dock.png)
 - Optional set key repeat `defaults write -g ApplePressAndHoldEnabled -bool false`
 
 ### iTerm2 Sync Settings
@@ -90,6 +105,10 @@
 - Run `$ ssh-add -K ~/.ssh/id_rsa` to asdd your SSH private key to the ssh-agent and store your passphrase in the keychain
 - Get SSH Key by running `pbcopy < ~/.ssh/id_rsa.pub`
 - Paste in Github SSH Key field
+
+### Vim
+
+- Open vim and run `:PlugInstall`
 
 ### Brave
 
