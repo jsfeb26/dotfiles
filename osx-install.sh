@@ -80,6 +80,7 @@ printf "\e[42m Symlinking Profiles \e[0m\n"
 rm ~/.zshrc
 rm ~/.vimrc
 rm ~/.gitconfig
+rm ~/.gitconfig_global
 rm ~/.tmux.conf
 rm ~/.tmux.conf.local
 rm -rf ~/iterm
@@ -87,6 +88,7 @@ rm -rf ~/iterm
 ln -s ~/dotfiles/profiles/.zshrc ~/
 ln -s ~/dotfiles/profiles/.vimrc ~/
 ln -s ~/dotfiles/profiles/.gitconfig ~/
+ln -s ~/dotfiles/profiles/.gitconfig_global ~/
 ln -s ~/dotfiles/profiles/.tmux.conf ~/
 ln -s ~/dotfiles/profiles/.tmux.conf.local ~/
 ln -s ~/dotfiles/profiles/iterm ~/
