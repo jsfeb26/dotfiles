@@ -25,7 +25,9 @@
 
 ### Magnet Settings
 
-![Magnet Settings](settings/magnet-settings.png)
+![Magnet Settings](settings/magnet-halves-and-quarters.png)
+![Magnet Settings](settings/magnet-thirds-and-sixths.png)
+![Magnet Settings](settings/magnet-others.png)
 
 ### Alfred Settings and Snippets
 
@@ -42,25 +44,25 @@
 ### Mac Settings
 
 - Install Flipqlo Clock Screen Saver `~/dotfiles/installers/Fliqlo.dmg`
-- Install TrackballWorks `~/dotfiles/installers/trackball-works.pkg`
-![TrackballWorks Settings](settings/trackballworks.png)
+- Install TrackballWorks `~/dotfiles/installers/TrackballWorks.dmg`
+  ![TrackballWorks Settings](settings/trackballworks.png)
 - Keyboard Settings
-![Keyboard Settings](settings/keyboard.png)
-![Keyboard Modifier Keys Settings](settings/keyboard_modifier-keys.png)
-![Keyboard Shortcuts Settings](settings/keyboard_shortcuts.png)
+  ![Keyboard Settings](settings/keyboard.png)
+  ![Keyboard Modifier Keys Settings](settings/keyboard_modifier-keys.png)
+  ![Keyboard Shortcuts Settings](settings/keyboard_shortcuts.png)
 - Mouse Settings
-![Mouse Settings](settings/mouse.png)
+  ![Mouse Settings](settings/mouse.png)
 - Energy Saver
-![Energy Saver Settings](settings/energy-saver.png)
+  ![Energy Saver Settings](settings/energy-saver.png)
 - Hot Corners
-![Hot Corners Settings](settings/hot-corners.png)
+  ![Hot Corners Settings](settings/hot-corners.png)
 - Mission Control
-![Mission Control Settings](settings/mission-control.png)
+  ![Mission Control Settings](settings/mission-control.png)
 - General
-![General Settings](settings/general.png)
+  ![General Settings](settings/general.png)
 - Dock
-![Dock Settings](settings/dock.png)
-- Optional set key repeat `defaults write -g ApplePressAndHoldEnabled -bool false`
+  ![Dock Settings](settings/dock.png)
+- [Optional] set key repeat `defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false`
 
 ### iTerm2 Sync Settings
 
@@ -73,8 +75,14 @@
 
 ### Iris
 
-- Go to Advanced -> Hidden Features
-- Type in `import` and choose `/Users/{username}/dotfiles/profiles/iris.iris_settings`
+- Buy new license or transfer license by looking in email
+  ![Iris Settings](settings/iris.blue-light.png)
+  ![Iris Settings](settings/iris-brightness.png)
+  ![Iris Settings](settings/iris-location.png)
+  ![Iris Settings](settings/iris-sleep.png)
+  ![Iris Settings](settings/iris-fonts.png)
+- ~~Go to Advanced -> Hidden Features~~
+- ~~Type in `import` and choose `/Users/{username}/dotfiles/profiles/iris.iris_settings`~~
 
 ### VSCode
 
@@ -96,13 +104,13 @@
 - Paste in
 
 ```config
-    Host *
-        AddKeysToAgent yes
-        UseKeychain yes
-        IdentityFile ~/.ssh/id_rsa
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_rsa
 ```
 
-- Run `$ ssh-add -K ~/.ssh/id_rsa` to asdd your SSH private key to the ssh-agent and store your passphrase in the keychain
+- Run `ssh-add -K ~/.ssh/id_rsa` to asdd your SSH private key to the ssh-agent and store your passphrase in the keychain
 - Get SSH Key by running `pbcopy < ~/.ssh/id_rsa.pub`
 - Paste in Github SSH Key field
 
