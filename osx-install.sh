@@ -95,4 +95,4 @@ ln -s ~/dotfiles/profiles/iterm ~/
 
 figlet "Great Success!!!"
 
-chsh -s /bin/zsh # make zsh default shell nvm install stable
+chsh -s /bin/zsh # make zsh default shell
