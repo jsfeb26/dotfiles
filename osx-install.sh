@@ -1,5 +1,5 @@
 printf "\e[42m Installing Homebrew \e[0m\n"
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew update
 brew tap homebrew/bundle
 brew tap homebrew/cask
@@ -42,20 +42,21 @@ curl -o- -L https://yarnpkg.com/install.sh | bash
 # brew install grep, args: ["with-default-names"]
 
 printf "\e[42m Installing Programs \e[0m\n"
-brew cask install iterm2
-brew cask install alfred
-brew cask install firefox
-brew cask install brave-browser
-brew cask install google-chrome
-brew cask install hyperswitch
-brew cask install iris
-brew cask install 1password
-brew cask install slack
-brew cask install atom
-brew cask install kindle
-brew cask install evernote
-brew cask install dropbox
-brew cask install visual-studio-code
+brew install --cask iterm2
+brew install --cask alfred
+brew install --cask firefox
+brew install --cask brave-browser
+brew install --cask google-chrome
+brew install --cask hyperswitch
+brew install --cask 1password
+brew install --cask slack
+brew install --cask atom
+brew install --cask kindle
+brew install --cask evernote
+brew install --cask dropbox
+brew install --cask visual-studio-code
+# Need to install specific version if transferring license
+# brew install --cask iris
 
 printf "\e[42m Installing Atom Setting Sync \e[0m\n"
 apm install sync-settings

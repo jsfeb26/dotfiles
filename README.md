@@ -1,9 +1,16 @@
 # Dev Setup
 
 1. Install xcode run `xcode-select --install`
-2. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
-3. Run `~/dotfiles/osx-install.sh`
-4. Run `~/dotfiiles/post-install.sh`
+2. [Create a Rosetta version of terminal](https://osxdaily.com/2020/11/18/how-run-homebrew-x86-terminal-apple-silicon-mac/)
+3. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
+4. Sign into App Store
+5. Run `~/dotfiles/osx-install.sh`
+6. Run `~/dotfiiles/post-install.sh`
+7. If you get `Zsh detects insecure completion-dependent directories` errors then run:
+```
+chmod 755 /usr/local/share/zsh
+chmod 755 /usr/local/share/zsh/site-functions
+```
 
 ## Customize Settings
 
@@ -75,8 +82,8 @@
 
 ### Iris
 
-- Buy new license or transfer license by looking in email
-  ![Iris Settings](settings/iris.blue-light.png)
+- Buy new license or transfer license by signing in to [User Panel](https://iristech.co/custom-code/user-panel/pages/my_licenses.php)
+  ![Iris Settings](settings/iris-blue-light.png)
   ![Iris Settings](settings/iris-brightness.png)
   ![Iris Settings](settings/iris-location.png)
   ![Iris Settings](settings/iris-sleep.png)

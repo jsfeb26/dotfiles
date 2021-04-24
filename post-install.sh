@@ -1,5 +1,8 @@
 printf "\e[42m Installing Additional Things \e[0m\n"
 
+# sourcing nvm
+. ~/.nvm/nvm.sh
+
 nvm install stable
 nvm alias default stable
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
