@@ -8,6 +8,7 @@ brew tap mongodb/brew
 
 printf "\e[42m Installing Git \e[0m\n"
 brew install git
+brew install gh	
 
 printf "\e[42m Install node via NVM \e[0m\n"
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
@@ -23,7 +24,7 @@ brew cask install virtualbox
 brew install docker-compose
 
 printf "\e[42m Installing Misc \e[0m\n"
-brew install mongodb-community@4.2
+brew install mongodb-community@5.0
 brew install bash-completion
 brew install diff-so-fancy
 brew install python
