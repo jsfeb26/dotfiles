@@ -24,10 +24,10 @@ brew cask install virtualbox
 brew install docker-compose
 
 printf "\e[42m Installing Misc \e[0m\n"
-brew install mongodb-community@5.0
+brew install mongodb-community@5.0.8
 brew install bash-completion
 brew install diff-so-fancy
-brew install python
+brew install python3
 brew install wget
 brew install hub
 brew install ack
