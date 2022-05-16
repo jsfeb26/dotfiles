@@ -112,7 +112,7 @@ alias gl='git log --graph --pretty=format:'\''%Cred%h%Creset - %Cgreen[%an]%Cres
 alias s="git status"
 
 # Add syntax highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /Users/jstinson/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # VSCode
 # I think this ends up on $PATH from bash profile
@@ -161,3 +161,4 @@ export PATH=$PATH:$ANDROID_HOME/tools
 export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
+fpath=($fpath "/Users/jstinson/.zfunctions")

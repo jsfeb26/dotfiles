@@ -1,6 +1,9 @@
 printf "\e[42m Installing Homebrew \e[0m\n"
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# TODO: Add brew commands to add brew to current scope
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/jstinson/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 brew update
 brew tap homebrew/bundle
 brew tap homebrew/cask
@@ -13,7 +16,8 @@ brew install gh
 
 printf "\e[42m Install node via NVM \e[0m\n"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-# TODO: Add command to add nvm to path
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 printf "\e[42m Install Tmux \e[0m\n"
 brew install tmux
