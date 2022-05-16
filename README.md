@@ -143,6 +143,12 @@ Host *
 - Run by double clicking `~/dotfiles/installers/Send-to-Home-Inventory.workflow`
 - Run `git co settings`
 
+### Install Hot
+
+- https://github.com/macmade/Hot/releases
+- Check top 3 checkboxes and "Start at Login"
+- Change Font to "Dank Mono"
+
 ### Atom
 
 - In 1Password go to Github and copy token `atom-setting-sync-personal-token` and gistID `atom-setting-sync-gist`
