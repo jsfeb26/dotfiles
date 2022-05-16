@@ -1,12 +1,14 @@
 # Dev Setup
 
 1. Install xcode run `xcode-select --install`
-2. [Create a Rosetta version of terminal](https://osxdaily.com/2020/11/18/how-run-homebrew-x86-terminal-apple-silicon-mac/)
-3. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
-4. Sign into App Store
-5. Run `~/dotfiles/osx-install.sh`
-6. Run `~/dotfiiles/post-install.sh`
-7. If you get `Zsh detects insecure completion-dependent directories` errors then run:
+2. Download [1Password](https://1password.com/downloads/mac/) and setup another device on existing computer
+3. ~~[Create a Rosetta version of terminal](https://osxdaily.com/2020/11/18/how-run-homebrew-x86-terminal-apple-silicon-mac/)~~
+4. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
+5. Sign into App Store
+6. Run `bash ~/dotfiles/osx-install.sh`
+7. Run `bash ~/dotfiiles/post-install.sh`
+8. If you get `Zsh detects insecure completion-dependent directories` errors then run:
+
 ```
 chmod 755 /usr/local/share/zsh
 chmod 755 /usr/local/share/zsh/site-functions
@@ -22,11 +24,10 @@ chmod 755 /usr/local/share/zsh/site-functions
 
 ### Sign In To Accounts
 
-- 1password
 - Dropbox
 - Chrome
 - Bear
-- Todoist
+- Things
 - Kindle
 - Evernote
 
@@ -83,6 +84,8 @@ chmod 755 /usr/local/share/zsh/site-functions
 ### Iris
 
 - Buy new license or transfer license by signing in to [User Panel](https://iristech.co/custom-code/user-panel/pages/my_licenses.php)
+- - 1.1.5 Macbook Air 2021
+- - 1.2.0 Macbook Pro (Ambient)
 - Use installer for in specific iris version in `/installers/*`
   ![Iris Settings](settings/iris-blue-light.png)
   ![Iris Settings](settings/iris-brightness.png)
@@ -94,11 +97,13 @@ chmod 755 /usr/local/share/zsh/site-functions
 
 ### VSCode
 
-- Install "Settings Sync" in VSCode
-- In 1Password go to Github and copy token `vs-code-setting-sync-token` and gistID `vscode-sync-gist`
-- In VSCode open command palette (`command + shift + p`) and then type `Sync: Download Settings`
-- Enter token and gistId
-- Restart VSCode
+- Click Settings Icon in bottom left and turn `Settings Sync`
+- Check all checkboxes and sign in with GitHub
+- ~~Install "Settings Sync" in VSCode~~
+- ~~In 1Password go to Github and copy token `vs-code-setting-sync-token` and gistID `vscode-sync-gist`~~
+- ~~In VSCode open command palette (`command + shift + p`) and then type `Sync: Download Settings`~~
+- ~~Enter token and gistId~~
+- ~~Restart VSCode~~
 
 ### Github add SSH Key
 

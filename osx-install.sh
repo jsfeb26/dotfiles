@@ -1,5 +1,6 @@
 printf "\e[42m Installing Homebrew \e[0m\n"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# TODO: Add brew commands to add brew to current scope
 brew update
 brew tap homebrew/bundle
 brew tap homebrew/cask
@@ -11,7 +12,8 @@ brew install git
 brew install gh	
 
 printf "\e[42m Install node via NVM \e[0m\n"
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+# TODO: Add command to add nvm to path
 
 printf "\e[42m Install Tmux \e[0m\n"
 brew install tmux
@@ -35,7 +37,8 @@ brew install tree
 brew install tldr
 brew install figlet
 # installing yarn with curl because brew get's latest node and I'm using nvm for that
-curl -o- -L https://yarnpkg.com/install.sh | bash
+# TODO: Figure out how to install yarn 2+
+# curl -o- -L https://yarnpkg.com/install.sh | bash
 
 # brew install fzf
 # brew install highlight
@@ -49,7 +52,7 @@ brew install --cask firefox
 brew install --cask brave-browser
 brew install --cask google-chrome
 brew install --cask hyperswitch
-brew install --cask 1password
+# brew install --cask 1password
 brew install --cask slack
 brew install --cask atom
 brew install --cask kindle
@@ -65,9 +68,10 @@ apm install sync-settings
 printf "\e[42m Installing Mac App Store Package Manager and Apps \e[0m\n"
 brew install mas
 mas install 1091189122 # Bear
-mas install 585829637  # Todoist
+# mas install 585829637  # Todoist
 mas install 441258766  # Magnet
 mas install 413564952  # Home Inventory
+mas install 904280696  # Things3
 
 printf "\e[42m Installing Fonts \e[0m\n"
 cp -R ~/dotfiles/fonts/. ~/Library/Fonts/
