@@ -23,7 +23,8 @@ ZSH_TMUX_AUTOSTART='true'
 # POWERLEVEL9K_DIR_HOME_FOREGROUND="white"
 # POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND="white"
 # POWERLEVEL9K_DIR_DEFAULT_FOREGROUND="white"
-ZSH_THEME=""
+# ZSH_THEME=""
+ZSH_THEME="spaceship"
 
 # need to set to use to get rid of long prompt
 DEFAULT_USER="jstinson"
@@ -73,12 +74,13 @@ DEFAULT_USER="jstinson"
 plugins=(sudo git history taskwarrior tmux tmuxinator zsh-autosuggestions)
 # plugins=(sudo git history taskwarrior zsh-autosuggestions)
 
-source $ZSH/oh-my-zsh.sh
-
+# Having issues with setting prompt like this so going to set prompt with OH_MY_ZSH
 # set prompt
-autoload -U promptinit; promptinit
+# autoload -U promptinit; promptinit
 # prompt pure
-prompt spaceship
+# prompt spaceship
+
+source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
