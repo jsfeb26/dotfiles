@@ -36,3 +36,5 @@
 	defaultBranch = main
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+[commit]
+	template = /Users/jstinson/dotfiles/profiles/.gitmessage
