@@ -38,3 +38,5 @@
 	insteadOf = https://github.com/
 [commit]
 	template = /Users/jstinson/dotfiles/profiles/.gitmessage
+[format]
+	pretty = format:%Cred%h%Creset - %Cgreen[%an]%Creset%C(yellow)%d%Creset: %s %Cgreen(%cr)%Creset
