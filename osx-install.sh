@@ -19,6 +19,9 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
+printf "\e[42m Install Antigen for managing plugins \e[0m\n"
+curl -L git.io/antigen > ~/antigen.zsh
+
 printf "\e[42m Install Tmux \e[0m\n"
 brew install tmux
 brew install reattach-to-user-namespace
@@ -44,7 +47,7 @@ brew install figlet
 # TODO: Figure out how to install yarn 2+
 # curl -o- -L https://yarnpkg.com/install.sh | bash
 
-# brew install fzf
+brew install fzf
 # brew install highlight
 # brew install markdown
 # brew install grep, args: ["with-default-names"]
@@ -58,16 +61,12 @@ brew install --cask google-chrome
 brew install --cask hyperswitch
 # brew install --cask 1password
 brew install --cask slack
-brew install --cask atom
 brew install --cask kindle
 brew install --cask evernote
 brew install --cask dropbox
 brew install --cask visual-studio-code
 # Need to install specific version if transferring license
 # brew install --cask iris
-
-printf "\e[42m Installing Atom Setting Sync \e[0m\n"
-apm install sync-settings
 
 printf "\e[42m Installing Mac App Store Package Manager and Apps \e[0m\n"
 brew install mas
@@ -86,6 +85,7 @@ mkdir ~/dev
 
 printf "\e[42m Installing \e[0m\n"
 brew install zsh
+brew install starship
 
 printf "\e[42m Installing Vim Plug \e[0m\n"
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
