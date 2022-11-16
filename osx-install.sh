@@ -4,6 +4,9 @@ printf "\e[42m Installing Homebrew \e[0m\n"
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/jstinson/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+printf "\e[42m Installing Rust \e[0m\n"
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
 brew update
 brew tap homebrew/bundle
 brew tap homebrew/cask
@@ -54,11 +57,13 @@ brew install fzf
 
 printf "\e[42m Installing Programs \e[0m\n"
 brew install --cask iterm2
-brew install --cask alfred
+# brew install --cask alfred
+brew install --cask raycast
 brew install --cask firefox
 brew install --cask brave-browser
 brew install --cask google-chrome
 brew install --cask hyperswitch
+brew install --cask 1password/tap/1password-cli
 # brew install --cask 1password
 brew install --cask slack
 brew install --cask kindle
