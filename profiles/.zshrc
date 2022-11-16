@@ -1,5 +1,5 @@
 ZSH_DISABLE_COMPFIX="true"                                           # Disable zsh compinit warning 
-ZSH_TMUX_AUTOSTART='true'                                            # make tmux start every time shell starts  
+# ZSH_TMUX_AUTOSTART='true'                                            # make tmux start every time shell starts  
 DEFAULT_USER="jstinson"                                              # need to set to use to get rid of long prompt
 
 export ZSH=/Users/jstinson/.oh-my-zsh                                # Path to your oh-my-zsh installation.
@@ -10,10 +10,6 @@ if [[ -n $SSH_CONNECTION ]]; then                                    # Set edito
 else
   export EDITOR='vim'
 fi
-
-# =========================== Aliases ========================================================================
-
-alias git='hub'
 
 # ============================================================================================================
 
@@ -78,15 +74,6 @@ load-nvmrc() {
 }
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
-
-# ============================================================================================================
-
-# =========================== hub ============================================================================
-
-# Delete Git's official completions to allow Zsh's official Git completions to work.
-# This is also necessary for hub's Zsh completions to work:
-# https://github.com/github/hub/issues/1956
-[ -f /usr/local/share/zsh/site-functions/_git ] && rm /usr/local/share/zsh/site-functions/_git
 
 # ============================================================================================================
 
