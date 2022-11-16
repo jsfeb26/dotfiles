@@ -104,6 +104,7 @@ printf "\e[42m Symlinking Profiles \e[0m\n"
 [ ! -e ~/.tmux.conf ] || rm ~/.tmux.conf
 [ ! -e ~/.tmux.conf.local ] || rm ~/.tmux.conf.local
 [ ! -e ~/iterm ] || rm -rf ~/iterm
+[ ! -e ~/.config/starship.toml ] || rm -rf ~/.config/starship.toml
 
 ln -s ~/dotfiles/profiles/.zshrc ~/
 ln -s ~/dotfiles/profiles/.vimrc ~/
@@ -112,6 +113,7 @@ ln -s ~/dotfiles/profiles/.gitconfig_global ~/
 ln -s ~/dotfiles/profiles/.tmux.conf ~/
 ln -s ~/dotfiles/profiles/.tmux.conf.local ~/
 ln -s ~/dotfiles/profiles/iterm ~/
+ln -s ~/dotfiles/.config/starship.toml ~/.config/
 
 figlet "Great Success!!!"
 
