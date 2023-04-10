@@ -34,10 +34,14 @@
   new = green bold
   whitespace = red reverse
 [init]
-	defaultBranch = main
+  defaultBranch = main
 [url "git@github.com:"]
-	insteadOf = https://github.com/
+  insteadOf = https://github.com/
 [commit]
-	template = /Users/jstinson/dotfiles/profiles/.gitmessage
+  template = /Users/jstinson/dotfiles/profiles/.gitmessage
 [format]
-	pretty = format:%Cred%h%Creset - %Cgreen[%an]%Creset%C(yellow)%d%Creset: %s %Cgreen(%cr)%Creset
+  pretty = format:%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(bold red)%an%C(reset)%C(bold yellow)%d%C(reset) %C(white)- %s%C(reset)
+  
+# alertantive log
+# git log --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%an%C(reset)%C(bold yellow)%d%C(reset) %C(dim white)- %s%C(reset)' --all
+
