@@ -9,7 +9,7 @@
 7. Run `bash ~/dotfiiles/post-install.sh`
 8. If you get `Zsh detects insecure completion-dependent directories` errors then run:
 
-```
+```bash
 chmod 755 /usr/local/share/zsh
 chmod 755 /usr/local/share/zsh/site-functions
 ```
@@ -54,6 +54,8 @@ chmod 755 /usr/local/share/zsh/site-functions
 - Install Flipqlo Clock Screen Saver `~/dotfiles/installers/Fliqlo.dmg`
 - Install TrackballWorks `~/dotfiles/installers/TrackballWorks.dmg`
   ![TrackballWorks Settings](settings/trackballworks.png)
+- [Install Logitech Options](https://support.logi.com/hc/en-us/articles/360025297893)
+  - Make bottom button open Mission Control
 - Keyboard Settings
   ![Keyboard Settings](settings/keyboard.png)
   ![Keyboard Modifier Keys Settings](settings/keyboard_modifier-keys.png)
@@ -84,8 +86,8 @@ chmod 755 /usr/local/share/zsh/site-functions
 ### Iris
 
 - Buy new license or transfer license by signing in to [User Panel](https://iristech.co/custom-code/user-panel/pages/my_licenses.php)
-- - 1.1.5 Macbook Air 2021
-- - 1.2.0 Macbook Pro (Ambient)
+  - 1.1.5 Macbook Air 2021
+  - 1.2.0 Macbook Pro (Ambient)
 - Use installer for in specific iris version in `/installers/*`
   ![Iris Settings](settings/iris-blue-light.png)
   ![Iris Settings](settings/iris-brightness.png)
@@ -145,7 +147,7 @@ Host *
 
 ### Install Hot
 
-- https://github.com/macmade/Hot/releases
+- <https://github.com/macmade/Hot/releases>
 - Check top 3 checkboxes and "Start at Login"
 - Change Font to "Dank Mono"
 
