@@ -116,3 +116,10 @@ fpath=($fpath "/Users/jstinson/.zfunctions")
 # source /Users/jstinson/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # source $ZSH/oh-my-zsh.sh
+# pnpm
+export PNPM_HOME="/Users/jstinson/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
