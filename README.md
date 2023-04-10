@@ -157,3 +157,9 @@ Host *
 - [Download](https://licenses.cleanshot.com/download/cleanshotx) or use installer in repo
 - Get License Key from 1Password
 - TODO: Share settings here once it's configured
+
+### Install Bartender 4
+
+- [Download](https://www.macbartender.com/Bartender4/purchase.html) or use installer in repo
+- Get License Key from 1Password
+- TODO: Share settings here once it's configured
