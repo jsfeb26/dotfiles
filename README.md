@@ -55,6 +55,7 @@ chmod 755 /usr/local/share/zsh/site-functions
 - Install TrackballWorks `~/dotfiles/installers/TrackballWorks.dmg`
   ![TrackballWorks Settings](settings/trackballworks.png)
 - [Install Logitech Options](https://support.logi.com/hc/en-us/articles/360025297893)
+  - Installer is located in Dropbox/Installers
   - Make bottom button open Mission Control
 - Keyboard Settings
   ![Keyboard Settings](settings/keyboard.png)
@@ -151,15 +152,8 @@ Host *
 - Check top 3 checkboxes and "Start at Login"
 - Change Font to "Dank Mono"
 
-### Atom
+### Install CleanShotX
 
-- In 1Password go to Github and copy token `atom-setting-sync-personal-token` and gistID `atom-setting-sync-gist`
-- Edit `Config.json` by adding
-
-```json
-    "sync-settings":
-    gistId: "{your_gist_id}"
-    personalAccessToken: "{your_token}"
-```
-
-- Open Command Palette and run `sync-settings:restore`
+- [Download](https://licenses.cleanshot.com/download/cleanshotx) or use installer in repo
+- Get License Key from 1Password
+- TODO: Share settings here once it's configured
