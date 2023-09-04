@@ -37,6 +37,7 @@ brew install docker-compose
 
 printf "\e[42m Installing Misc \e[0m\n"
 brew install mongodb-community@5.0.8
+brew install postgresql
 brew install bash-completion
 brew install diff-so-fancy
 brew install python3
@@ -72,6 +73,7 @@ brew install --cask kindle
 brew install --cask evernote
 brew install --cask dropbox
 brew install --cask visual-studio-code
+brew install --cask pgadmin4
 # Need to install specific version if transferring license
 # brew install --cask iris
 
