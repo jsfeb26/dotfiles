@@ -96,9 +96,10 @@ printf "\e[42m Installing \e[0m\n"
 brew install zsh
 brew install starship
 
-printf "\e[42m Installing Vim Plug \e[0m\n"
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+printf "\e[42m Installing nvim \e[0m\n"
+brew install neovim
+git clone --depth 1 https://github.com/AstroNvim/AstroNvim ~/.config/nvim
+git clone https://github.com/jsfeb26/astronvim_config.git ~/.config/nvim/lua/user
 
 printf "\e[42m Symlinking Profiles \e[0m\n"
 [ ! -e ~/.zshrc ] || rm ~/.zshrc
