@@ -59,6 +59,7 @@ printf "\e[42m Installing Programs \e[0m\n"
 brew install --cask iterm2
 # brew install --cask alfred
 brew install --cask raycast
+brew install --cask warp
 brew install --cask firefox
 brew install --cask brave-browser
 brew install --cask google-chrome
@@ -77,7 +78,7 @@ printf "\e[42m Installing Mac App Store Package Manager and Apps \e[0m\n"
 brew install mas
 mas install 1091189122 # Bear
 # mas install 585829637  # Todoist
-mas install 441258766  # Magnet
+# mas install 441258766  # Magnet
 mas install 413564952  # Home Inventory
 mas install 904280696  # Things3
 mas install 1485052491 # Dropzone 4
