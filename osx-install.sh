@@ -60,6 +60,7 @@ brew install --cask iterm2
 # brew install --cask alfred
 brew install --cask raycast
 brew install --cask warp
+brew install --cask arc
 brew install --cask firefox
 brew install --cask brave-browser
 brew install --cask google-chrome
