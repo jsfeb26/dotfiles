@@ -149,3 +149,7 @@ Host *
 ### Configure CleanMyMac
 
 - Sign into MacPaw account to Activate
+
+### Configure Meeting Bar
+
+- TODO: Add this

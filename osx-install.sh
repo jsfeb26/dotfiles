@@ -32,7 +32,7 @@ brew install reattach-to-user-namespace
 printf "\e[42m Installing Docker \e[0m\n"
 brew install docker
 brew install docker-machine
-brew cask install virtualbox
+brew install virtualbox
 brew install docker-compose
 
 printf "\e[42m Installing Misc \e[0m\n"
@@ -57,23 +57,23 @@ brew install fzf
 # brew install grep, args: ["with-default-names"]
 
 printf "\e[42m Installing Programs \e[0m\n"
-brew install --cask iterm2
-# brew install --cask alfred
-brew install --cask raycast
-brew install --cask warp
-brew install --cask arc
-brew install --cask firefox
-brew install --cask brave-browser
-brew install --cask google-chrome
-brew install --cask 1password/tap/1password-cli
+brew install iterm2
+brew install raycast
+brew install warp
+brew install arc
+brew install firefox
+brew install brave-browser
+brew install google-chrome
+brew install 1password/tap/1password-cli
 brew install 1password
-brew install --cask slack
-brew install --cask kindle
-brew install --cask evernote
-brew install --cask dropbox
-brew install --cask visual-studio-code
-brew install --cask pgadmin4
+brew install slack
+brew install kindle
+brew install evernote
+brew install dropbox
+brew install visual-studio-code
+brew install pgadmin4
 brew install nordvpn
+brew install dropzone
 brew install meetingbar
 brew install craft
 brew install hot
@@ -90,7 +90,7 @@ mas install 1091189122 # Bear
 # mas install 441258766  # Magnet
 mas install 413564952  # Home Inventory
 mas install 904280696  # Things3
-mas install 1485052491 # Dropzone 4
+# mas install 1485052491 # Dropzone 4
 
 printf "\e[42m Installing Fonts \e[0m\n"
 cp -R ~/dotfiles/fonts/. ~/Library/Fonts/
