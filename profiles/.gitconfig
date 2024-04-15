@@ -1,6 +1,7 @@
 [rerere]
   name = Jason Stinson
   email = jsfeb26@gmail.com
+  enabled = true # re-use conflict resolutions that you already did
 [alias]
   co = checkout
   br = branch
@@ -46,3 +47,5 @@
 # alertantive log
 # git log --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%an%C(reset)%C(bold yellow)%d%C(reset) %C(dim white)- %s%C(reset)' --all
 
+[maintenance]
+	repo = /Users/jstinson/ambient/src/product
