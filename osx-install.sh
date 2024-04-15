@@ -65,15 +65,20 @@ brew install --cask arc
 brew install --cask firefox
 brew install --cask brave-browser
 brew install --cask google-chrome
-brew install --cask hyperswitch
 brew install --cask 1password/tap/1password-cli
-# brew install --cask 1password
+brew install 1password
 brew install --cask slack
 brew install --cask kindle
 brew install --cask evernote
 brew install --cask dropbox
 brew install --cask visual-studio-code
 brew install --cask pgadmin4
+brew install meetingbar
+brew install craft
+brew install hot
+brew install cleanshot
+brew install bartender
+brew install cleanmymac
 # Need to install specific version if transferring license
 # brew install --cask iris
 

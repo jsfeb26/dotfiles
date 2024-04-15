@@ -31,24 +31,6 @@ chmod 755 /usr/local/share/zsh/site-functions
 - Kindle
 - Evernote
 
-### Magnet Settings
-
-![Magnet Settings](settings/magnet-halves-and-quarters.png)
-![Magnet Settings](settings/magnet-thirds-and-sixths.png)
-![Magnet Settings](settings/magnet-others.png)
-
-### Alfred Settings and Snippets
-
-- Open Alfred and Skip Setup
-- Open System Preferences -> Keyboard -> Shortcuts -> Spotlight
-  - Unheck both checkboxes
-- Go back to Alfred and set hotkey to cmd+space
-- Click on Powerpack and then "Activate License"
-  - Find license key in email
-- Go to Advanced and under Syncing click 'Set prefences folder..."
-  - Choose `~/Dropbox/Alfred/`
-- Go to Features -> Clipboard and check all of the clipboard history options
-
 ### Mac Settings
 
 - Install Flipqlo Clock Screen Saver `~/dotfiles/installers/Fliqlo.dmg`
@@ -79,10 +61,6 @@ chmod 755 /usr/local/share/zsh/site-functions
 
 - Preferences -> General -> Preferences
 - Check both checkboxes and set path to `/Users/{username}/dotfiles/profiles/iterm`
-
-### hyperswitch
-
-![Hyperswitch Settings](settings/hyperswitch-settings.png)
 
 ### Iris
 
@@ -146,20 +124,28 @@ Host *
 - Run by double clicking `~/dotfiles/installers/Send-to-Home-Inventory.workflow`
 - Run `git co settings`
 
-### Install Hot
+### Configure Hot
 
-- <https://github.com/macmade/Hot/releases>
+- ~~<https://github.com/macmade/Hot/releases>~~
 - Check top 3 checkboxes and "Start at Login"
 - Change Font to "Dank Mono"
 
-### Install CleanShotX
+### Configure CleanShotX
 
-- [Download](https://licenses.cleanshot.com/download/cleanshotx) or use installer in repo
+- ~~[Download](https://licenses.cleanshot.com/download/cleanshotx) or use installer in repo~~
 - Get License Key from 1Password
 - TODO: Share settings here once it's configured
 
-### Install Bartender 4
+### Configure Bartender 5
 
-- [Download](https://www.macbartender.com/Bartender4/purchase.html) or use installer in repo
+- ~~[Download](https://www.macbartender.com/Bartender4/purchase.html) or use installer in repo~~
 - Get License Key from 1Password
 - TODO: Share settings here once it's configured
+
+### Configure Hyperkey
+
+![Hyperkey Settings](settings/hyperkey.png)
+
+### Configure CleanMyMac
+
+- Sign into MacPaw account to Activate
