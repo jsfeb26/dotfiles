@@ -73,6 +73,7 @@ brew install --cask evernote
 brew install --cask dropbox
 brew install --cask visual-studio-code
 brew install --cask pgadmin4
+brew install nordvpn
 brew install meetingbar
 brew install craft
 brew install hot
