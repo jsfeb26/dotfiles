@@ -1,8 +1,8 @@
 ZSH_DISABLE_COMPFIX="true"                                           # Disable zsh compinit warning 
 # ZSH_TMUX_AUTOSTART='true'                                            # make tmux start every time shell starts  
-DEFAULT_USER="jstinson"                                              # need to set to use to get rid of long prompt
+DEFAULT_USER="jasonstinson"                                              # need to set to use to get rid of long prompt
 
-export ZSH=/Users/jstinson/.oh-my-zsh                                # Path to your oh-my-zsh installation.
+export ZSH=/Users/jasonstinson/.oh-my-zsh                                # Path to your oh-my-zsh installation.
 export LANG=en_US.UTF-8                                              # Set language environment
 
 if [[ -n $SSH_CONNECTION ]]; then                                    # Set editor for ZSH and local
@@ -85,7 +85,7 @@ export PATH=$PATH:$ANDROID_HOME/tools
 export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
-fpath=($fpath "/Users/jstinson/.zfunctions")
+fpath=($fpath "/Users/jasonstinson/.zfunctions")
 
 # ============================================================================================================
 
@@ -113,11 +113,11 @@ fpath=($fpath "/Users/jstinson/.zfunctions")
 # alias gl='git log --graph --pretty=format:'\''%Cred%h%Creset - %Cgreen[%an]%Creset%C(yellow)%d%Creset: %s %Cgreen(%cr)%Creset'\'' --abbrev-commit --date=relative'
 
 # Add syntax highlighting
-# source /Users/jstinson/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source /Users/jasonstinson/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # source $ZSH/oh-my-zsh.sh
 # pnpm
-export PNPM_HOME="/Users/jstinson/Library/pnpm"
+export PNPM_HOME="/Users/jasonstinson/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;

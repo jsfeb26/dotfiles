@@ -40,7 +40,7 @@
 [url "git@github.com:"]
   insteadOf = https://github.com/
 [commit]
-  template = /Users/jstinson/dotfiles/profiles/.gitmessage
+  template = /Users/jasonstinson/dotfiles/profiles/.gitmessage
 [format]
   pretty = format:%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(bold red)%an%C(reset)%C(bold yellow)%d%C(reset) %C(white)- %s%C(reset)
   
@@ -48,4 +48,5 @@
 # git log --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%an%C(reset)%C(bold yellow)%d%C(reset) %C(dim white)- %s%C(reset)' --all
 
 [maintenance]
-	repo = /Users/jstinson/ambient/src/product
+	# repo = /Users/jstinson/ambient/src/product
+	repo = /Users/jasonstinson/dev/ambient/product
