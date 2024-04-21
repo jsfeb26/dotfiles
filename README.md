@@ -5,9 +5,10 @@
 3. ~~[Create a Rosetta version of terminal](https://osxdaily.com/2020/11/18/how-run-homebrew-x86-terminal-apple-silicon-mac/)~~
 4. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
 5. Sign into App Store
-6. Run `bash ~/dotfiles/osx-install.sh`
-7. Run `bash ~/dotfiiles/post-install.sh`
-8. If you get `Zsh detects insecure completion-dependent directories` errors then run:
+6. Run `bash ~/dotfiles/osx-install.sh {username}`
+7. Change all settings from "jasonstinson" to `{username}
+8. Run `bash ~/dotfiiles/post-install.sh`
+9. If you get `Zsh detects insecure completion-dependent directories` errors then run:
 
 ```bash
 chmod 755 /usr/local/share/zsh
@@ -57,11 +58,6 @@ chmod 755 /usr/local/share/zsh/site-functions
   ![Dock Settings](settings/dock.png)
 - [Optional] set key repeat `defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false`
 
-### iTerm2 Sync Settings
-
-- Preferences -> General -> Preferences
-- Check both checkboxes and set path to `/Users/{username}/dotfiles/profiles/iterm`
-
 ### Iris
 
 - Buy new license or transfer license by signing in to [User Panel](https://iristech.co/custom-code/user-panel/pages/my_licenses.php)
@@ -104,43 +100,48 @@ Host *
   IdentityFile ~/.ssh/id_rsa
 ```
 
-- Run `ssh-add -K ~/.ssh/id_rsa` to asdd your SSH private key to the ssh-agent and store your passphrase in the keychain
+- Run `ssh-add --apple-use-keychain ~/.ssh/id_rsa` to add your SSH private key to the ssh-agent and store your passphrase in the keychain
 - Get SSH Key by running `pbcopy < ~/.ssh/id_rsa.pub`
 - Paste in Github SSH Key field
+
+### Warp
+
+- Click on Settings Icon in top right
+- Go to Appearance Tab
+  - Change Text to FiraCode Nerd Font Mono
+  - Click on Prompt and select `Shell prompt (PS1)`
+  - Turn on `Dim inactive panes`
 
 ### Vim
 
 - Open vim and run `:PlugInstall`
 
-### Brave
+### Configure Raycast
 
-- Import from Chrome
+- Integrate with 1Password CLI
+  - 1Password -> Settings -> Developer
 
-### Home Inventory
+### Configure iStat Menu
 
-- Open `iCloud Drive/Home Inventory/My_Stuff.hi3`
-- Update Backup Settings
-  ![Home Inventory Settings](settings/home-inventory-settings.png)
-- Run by double clicking `~/dotfiles/installers/Send-to-Home-Inventory.workflow`
-- Run `git co settings`
-
-### Configure Hot
-
-- ~~<https://github.com/macmade/Hot/releases>~~
-- Check top 3 checkboxes and "Start at Login"
-- Change Font to "Dank Mono"
-
-### Configure CleanShotX
-
-- ~~[Download](https://licenses.cleanshot.com/download/cleanshotx) or use installer in repo~~
 - Get License Key from 1Password
-- TODO: Share settings here once it's configured
+- Add Memory, Sensors, and Battery/Power
+  ![iState Menu Settings](settings/istat-menu.png)
 
 ### Configure Bartender 5
 
-- ~~[Download](https://www.macbartender.com/Bartender4/purchase.html) or use installer in repo~~
 - Get License Key from 1Password
-- TODO: Share settings here once it's configured
+- Go to Settings -> General
+  - Turn on `Start at login`
+  - Turn on `Click on empty menu bar space`
+  - Turn on `Show items in bar below menu bar (Bartender Bar)`
+  - Change `Bartender menu bar icon` to `Bartender`
+- Go to Settings -> Menu Bar Items
+  ![Bartender Menu Bar Items Settings](settings/bartender-menu-bar-items.png)
+
+### Configure CleanShotX
+
+- Get License Key from 1Password
+-
 
 ### Configure Hyperkey
 
@@ -153,3 +154,16 @@ Host *
 ### Configure Meeting Bar
 
 - TODO: Add this
+
+### iTerm2 Sync Settings
+
+- Preferences -> General -> Preferences
+- Check both checkboxes and set path to `/Users/{username}/dotfiles/profiles/iterm`
+
+### Home Inventory
+
+- Open `iCloud Drive/Home Inventory/My_Stuff.hi3`
+- Update Backup Settings
+  ![Home Inventory Settings](settings/home-inventory-settings.png)
+- Run by double clicking `~/dotfiles/installers/Send-to-Home-Inventory.workflow`
+- Run `git co settings`
