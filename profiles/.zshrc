@@ -16,7 +16,7 @@ fi
 # =========================== Homebrew =======================================================================
 
 eval "$(starship init zsh)"                                          # Set prompt to Starship
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh                               # Command-line fuzzy finder
+eval "$(fzf --zsh)"
 
 
 if type brew &>/dev/null                                             # Brew shell completion
@@ -29,13 +29,16 @@ fi
 
 # ============================================================================================================
 
-# =========================== Antigent =======================================================================
+# =========================== Antigen =======================================================================
 
+# Uncomment there is an error installing oh-my-zsh
+# ANTIGEN_LOG=~/antigen.log
 source ~/antigen.zsh
 
 antigen use oh-my-zsh
 antigen bundle zsh-users/zsh-syntax-highlighting                     # Syntax Highlighting
 antigen bundle zsh-users/zsh-autosuggestions                         # Autosuggestions
+antigen bundle zsh-users/zsh-completions                             # More zsh completions
 antigen bundle gezalore/zsh-prioritize-cwd-history                   # Prioritize history based on current dir
 antigen bundle Aloxaf/fzf-tab                                        # Fuzzy tab completion
 antigen bundle sudo
