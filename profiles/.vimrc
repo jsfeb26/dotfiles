@@ -52,7 +52,7 @@ let mapleader=","
     " Plug 'junegunn/goyo.vim'
     "
     " " Colours
-    Plug 'ajh17/Spacegray.vim'
+    Plug 'vim-scripts/Spacegray.vim'
     Plug 'altercation/vim-colors-solarized'
     Plug 'jackfranklin/Smyck-Color-Scheme'
 
