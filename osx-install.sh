@@ -1,7 +1,16 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "Error: No username provided. Please run the script as './osx-install.sh <username>'."
+  exit 1
+fi
+
+username=$1
+
 printf "\e[42m Installing Homebrew \e[0m\n"
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/jstinson/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$username/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 printf "\e[42m Installing Rust \e[0m\n"
@@ -76,10 +85,10 @@ brew install nordvpn
 brew install dropzone
 brew install meetingbar
 brew install craft
-brew install hot
 brew install cleanshot
 brew install bartender
 brew install cleanmymac
+brew install istat-menus
 # Need to install specific version if transferring license
 # brew install --cask iris
 
