@@ -89,6 +89,7 @@ brew install cleanshot
 brew install bartender
 brew install cleanmymac
 brew install istat-menus
+brew install keyboardcleantool
 # Need to install specific version if transferring license
 # brew install --cask iris
 
