@@ -79,6 +79,7 @@ brew install slack
 brew install kindle
 brew install evernote
 brew install dropbox
+brew install spotify
 brew install visual-studio-code
 brew install pgadmin4
 brew install nordvpn
