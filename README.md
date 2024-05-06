@@ -61,7 +61,8 @@ chmod 755 /usr/local/share/zsh/site-functions
 ### Iris
 
 - Buy new license or transfer license by signing in to [User Panel](https://iristech.co/custom-code/user-panel/pages/my_licenses.php)
-  - 1.1.5 Macbook Air 2021
+  - 1.1.2 NOT USED
+  - 1.1.5 Macbook Pro (Personal)
   - 1.2.0 Macbook Pro (Ambient)
 - Use installer for in specific iris version in `/installers/*`
   ![Iris Settings](settings/iris-blue-light.png)
