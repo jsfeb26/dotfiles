@@ -19,6 +19,10 @@ chmod 755 /usr/local/share/zsh/site-functions
 
 ---
 
+### Finicky Browser Redirect
+
+- Use [Finicky Kickstart](https://finicky-kickstart.vercel.app/) to generate new settins for new types of links
+
 ### iCloud
 
 - Sync Desktop and Documents
