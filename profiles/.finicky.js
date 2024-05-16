@@ -31,5 +31,10 @@ module.exports = {
       match: /^https:\/\/mui\.com\/.*$/,
       browser: "Google Chrome",
     },
+    {
+      // All Loom links
+      match: /^https:\/\/www\.loom\.com\/.*$/,
+      browser: "Google Chrome",
+    },
   ],
 };
