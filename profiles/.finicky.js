@@ -36,5 +36,20 @@ module.exports = {
       match: /^https:\/\/www\.loom\.com\/.*$/,
       browser: "Google Chrome",
     },
+    {
+      // Ambient Sentry Links
+      match: /^https:\/\/ambientai\.sentry\.io\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
+      // All AWS Console links
+      match: /^https:\/\/.*\.console\.aws\.amazon\.com\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
+      // Google Docs
+      match: /^https:\/\/docs\.google\.com\/.*$/,
+      browser: "Google Chrome",
+    },
   ],
 };
