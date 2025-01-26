@@ -68,10 +68,10 @@ brew install fzf
 printf "\e[42m Installing Programs \e[0m\n"
 brew install iterm2
 brew install raycast
-brew install warp
+# brew install warp
 brew install arc
 brew install firefox
-brew install brave-browser
+# brew install brave-browser
 brew install google-chrome
 brew install 1password/tap/1password-cli
 brew install 1password
@@ -92,17 +92,21 @@ brew install cleanmymac
 brew install istat-menus
 brew install keyboardcleantool
 brew install finicky
+brew install --cask notchnook
+brew install --cask ghostty
+brew install --cask notion
+brew install --cask notion-calendar
 # Need to install specific version if transferring license
 # brew install --cask iris
 
 printf "\e[42m Installing Mac App Store Package Manager and Apps \e[0m\n"
 brew install mas
-mas install 1091189122    # Bear
+# mas install 1091189122    # Bear
 # mas install 585829637   # Todoist
 # mas install 441258766   # Magnet
 mas install 413564952     # Home Inventory
 mas install 904280696     # Things3
-mas install 457622435     # Yoink
+# mas install 457622435     # Yoink
 # mas install 1485052491  # Dropzone 4
 
 printf "\e[42m Installing Fonts \e[0m\n"
