@@ -11,6 +11,8 @@
   cm = commit -m
   cp = cherry-pick
   open = browse -- .
+  # Delete all local branches except main
+  dasm = !git branch | grep -v "main" | xargs git branch -D
 [user]
   email = jsfeb26@gmail.com
   name = Jason Stinson
@@ -20,7 +22,8 @@
   helper = osxkeychain
 [core]
   pager = diff-so-fancy | less --tabs=4 -RFX
-  editor = nvim
+  # editor = nvim
+  editor = vim
 [color]
   ui = true
 [color "diff-highlight"]
