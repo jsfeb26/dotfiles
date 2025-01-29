@@ -114,6 +114,8 @@ fpath=($fpath "/Users/jasonstinson/.zfunctions")
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 # alias gl='git log --graph --pretty=format:'\''%Cred%h%Creset - %Cgreen[%an]%Creset%C(yellow)%d%Creset: %s %Cgreen(%cr)%Creset'\'' --abbrev-commit --date=relative'
+alias alias-list='cat ~/.zshrc | grep "alias" | grep -v "^#"'
+alias gitd="$HOME/dotfiles/scripts/deleteOldBranches.sh"
 
 # Add syntax highlighting
 # source /Users/jasonstinson/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
