@@ -17,6 +17,11 @@ module.exports = {
       browser: "Google Chrome",
     },
     {
+      // PagerDuty links
+      match: /^https:\/\/ambientai\.pagerduty\.com\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
       // All Figma links
       match: /^https:\/\/www\.figma\.com\/.*$/,
       browser: "Google Chrome",
