@@ -14,14 +14,14 @@
 #      and matching the naming pattern) and removes them.
 #   6. Deletes each branch that was created for a worktree (skipping "main").
 wtmerge() {
-  # Ensure exactly two arguments are passed: the branch to merge and commit message
-  if [ $# -ne 2 ]; then
-    echo "Usage: wtmerge <branch-to-keep> <commit-message>"
+  # Allow zero args for cleanup-only mode
+  if [ $# -eq 0 ]; then
+    echo "Cleanup mode: removing all worktrees without merging..."
+  elif [ $# -ne 2 ]; then
+    echo "Usage: wtmerge [<branch-to-keep> <commit-message>]"
+    echo "       wtmerge  (cleanup mode - no merging)"
     return 1
   fi
-
-  local branch_to_keep="$1"
-  local commit_message="$2"
 
   # Determine the repository root and its name.
   local repo_root repo_name
@@ -52,41 +52,47 @@ wtmerge() {
     fi
   done < <(git worktree list)
 
-  # Check that the target branch worktree exists.
-  local target_worktree=""
-  for wt in "${worktrees[@]}"; do
-    if [[ "$wt" == "$worktree_parent/${repo_name}-${branch_to_keep}" ]]; then
-      target_worktree="$wt"
-      break
-    fi
-  done
+  # Skip merge steps if in cleanup mode
+  if [ $# -eq 2 ]; then
+    local branch_to_keep="$1"
+    local commit_message="$2"
 
-  if [[ -z "$target_worktree" ]]; then
-    echo "Error: No active worktree found for branch '${branch_to_keep}' under ${worktree_parent}."
-    return 1
-  fi
+    # Check target branch exists...
+    local target_worktree=""
+    for wt in "${worktrees[@]}"; do
+      if [[ "$wt" == "$worktree_parent/${repo_name}-${branch_to_keep}" ]]; then
+        target_worktree="$wt"
+        break
+      fi
+    done
 
-  # Step 1: In the target worktree, check for uncommitted changes.
-  echo "Checking for uncommitted changes in worktree for branch '${branch_to_keep}'..."
-  if ! ( cd "$target_worktree" && git diff --quiet && git diff --cached --quiet ); then
-    echo "Changes detected in branch '${branch_to_keep}'. Attempting auto-commit..."
-    if ! ( cd "$target_worktree" &&
-            git add . &&
-            git commit -m "chore: auto-commit changes in '${branch_to_keep}' before merge" ); then
-      echo "Error: Auto-commit failed in branch '${branch_to_keep}'. Aborting merge."
+    if [[ -z "$target_worktree" ]]; then
+      echo "Error: No active worktree found for branch '${branch_to_keep}'."
       return 1
-    else
-      echo "Auto-commit successful in branch '${branch_to_keep}'."
     fi
-  else
-    echo "No uncommitted changes found in branch '${branch_to_keep}'."
-  fi
 
-  # Step 3: Merge the target branch
-  echo "Merging branch '${branch_to_keep}'..."
-  if ! git merge "${branch_to_keep}" -m "${commit_message}"; then
-    echo "Error: Merge failed. Please resolve conflicts and try again."
-    return 1
+    # Step 1: In the target worktree, check for uncommitted changes.
+    echo "Checking for uncommitted changes in worktree for branch '${branch_to_keep}'..."
+    if ! ( cd "$target_worktree" && git diff --quiet && git diff --cached --quiet ); then
+      echo "Changes detected in branch '${branch_to_keep}'. Attempting auto-commit..."
+      if ! ( cd "$target_worktree" &&
+              git add . &&
+              git commit -m "chore: auto-commit changes in '${branch_to_keep}' before merge" ); then
+        echo "Error: Auto-commit failed in branch '${branch_to_keep}'. Aborting merge."
+        return 1
+      else
+        echo "Auto-commit successful in branch '${branch_to_keep}'."
+      fi
+    else
+      echo "No uncommitted changes found in branch '${branch_to_keep}'."
+    fi
+
+    # Step 3: Merge the target branch
+    echo "Merging branch '${branch_to_keep}'..."
+    if ! git merge "${branch_to_keep}" -m "${commit_message}"; then
+      echo "Error: Merge failed. Please resolve conflicts and try again."
+      return 1
+    fi
   fi
 
   # Step 4: Remove all worktrees that were created via wtree().
@@ -115,5 +121,9 @@ wtmerge() {
     fi
   done
 
-  echo "Merge complete: Branch '${branch_to_keep}' merged into 'main', and all worktrees cleaned up."
+  if [ $# -eq 0 ]; then
+    echo "Cleanup complete: All worktrees removed."
+  else
+    echo "Merge complete: Branch '${branch_to_keep}' merged, and all worktrees cleaned up."
+  fi
 }
