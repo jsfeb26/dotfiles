@@ -128,3 +128,10 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# Load custom functions
+fpath=(~/dotfiles/scripts $fpath)
+for func in ~/dotfiles/scripts/*.zsh; do
+  source $func
+done
+
