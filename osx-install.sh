@@ -92,6 +92,8 @@ brew install cleanmymac
 brew install istat-menus
 brew install keyboardcleantool
 brew install finicky
+# Allows for screensharing a smaller portion of your screen
+brew install deskpad
 brew install --cask notchnook
 brew install --cask ghostty
 brew install --cask notion
