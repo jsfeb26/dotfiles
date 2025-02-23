@@ -30,8 +30,14 @@ wtmerge() {
   }
   repo_name=$(basename "$repo_root")
 
+  # TODO: Uncomment if you want a fixed parent directory for worktrees
   # Fixed parent directory where worktrees are located.
-  local worktree_parent="$HOME/dev"
+  # local worktree_parent="$HOME/dev"
+
+  # Set parent directory as the parent of the repo root. So the worktrees are in
+  # the same directory and sibling to the repo.
+  local worktree_parent=$(dirname "$repo_root")
+
 
   # Retrieve all active worktrees (from git worktree list) that match our naming convention.
   local worktrees=()

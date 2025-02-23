@@ -59,15 +59,27 @@ wtree() {
   }
   repo_name=$(basename "$repo_root")
 
-  # Set fixed parent directory for worktrees.
-  local worktree_parent="$HOME/dev"
-  # Ensure the worktree parent directory exists.
-  if [[ ! -d "$worktree_parent" ]]; then
-    if ! mkdir -p "$worktree_parent"; then
-      echo "Error: Failed to create worktree parent directory: $worktree_parent"
-      return 1
-    fi
-  fi
+  # TODO: Uncomment if you want a fixed parent directory for worktrees
+  # # Set fixed parent directory for worktrees.
+  # local worktree_parent="$HOME/dev"
+  # # Ensure the worktree parent directory exists.
+  # if [[ ! -d "$worktree_parent" ]]; then
+  #   if ! mkdir -p "$worktree_parent"; then
+  #     echo "Error: Failed to create worktree parent directory: $worktree_parent"
+  #     return 1
+  #   fi
+  # fi
+
+  # Set parent directory as the parent of the repo root. So the worktrees are in
+  # the same directory and sibling to the repo.
+  local repo_root repo_name
+  repo_root=$(git rev-parse --show-toplevel) || {
+    echo "Error: Cannot determine repository root."
+    return 1
+  }
+  repo_name=$(basename "$repo_root")
+  local worktree_parent=$(dirname "$repo_root")
+
 
   # Loop over each branch provided as argument.
   for branch in "${branches[@]}"; do
