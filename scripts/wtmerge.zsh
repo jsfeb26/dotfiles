@@ -1,7 +1,7 @@
 # wtmerge: Merge changes from a specified worktree branch into main,
 # then clean up all worktrees and delete their branches.
 #
-# Usage: wtmerge <branch-to-keep>
+# Usage: wtmerge <branch-to-keep> <commit-message>
 #
 # This function does the following:
 #   1. Verifies that the branch to merge (branch-to-keep) exists as an active worktree.
@@ -14,13 +14,14 @@
 #      and matching the naming pattern) and removes them.
 #   6. Deletes each branch that was created for a worktree (skipping "main").
 wtmerge() {
-  # Ensure exactly one argument is passed: the branch to merge.
-  if [ $# -ne 1 ]; then
-    echo "Usage: wtmerge <branch-to-keep>"
+  # Ensure exactly two arguments are passed: the branch to merge and commit message
+  if [ $# -ne 2 ]; then
+    echo "Usage: wtmerge <branch-to-keep> <commit-message>"
     return 1
   fi
 
   local branch_to_keep="$1"
+  local commit_message="$2"
 
   # Determine the repository root and its name.
   local repo_root repo_name
@@ -81,16 +82,9 @@ wtmerge() {
     echo "No uncommitted changes found in branch '${branch_to_keep}'."
   fi
 
-  # Step 2: Switch to the main worktree (assumed to be the current directory) and check out main.
-  echo "Switching to 'main' branch in the main worktree..."
-  if ! git checkout main; then
-    echo "Error: Failed to switch to 'main' branch."
-    return 1
-  fi
-
-  # Step 3: Merge the target branch into main.
-  echo "Merging branch '${branch_to_keep}' into 'main'..."
-  if ! git merge "${branch_to_keep}" -m "feat: merge changes from '${branch_to_keep}'"; then
+  # Step 3: Merge the target branch
+  echo "Merging branch '${branch_to_keep}'..."
+  if ! git merge "${branch_to_keep}" -m "${commit_message}"; then
     echo "Error: Merge failed. Please resolve conflicts and try again."
     return 1
   fi
