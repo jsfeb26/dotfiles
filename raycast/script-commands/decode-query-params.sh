@@ -30,9 +30,32 @@ return currentURL
 EOF
 )
 
-# Check if URL is from localhost:3000 or app.ambient.ai
-if [[ ! "$chrome_url" =~ ^https?://(localhost:3000|app\.ambient\.ai) ]]; then
-  echo "❌ URL must be from localhost:3000 or app.ambient.ai"
+# Get the directory where this script is located
+script_dir=$(dirname "$0")
+
+# Array of allowed URL patterns (supports both specific URLs and regex patterns)
+# Examples:
+#   "localhost:3000" - matches exactly localhost:3000
+#   ".*\.ambient\.ai" - matches any subdomain of ambient.ai (app.ambient.ai, staging.ambient.ai, etc.)
+#   "dev\.example\.com" - matches exactly dev.example.com
+allowed_urls=(
+  "localhost:3000"
+  ".*\.ambient\.ai"
+)
+
+# Check if URL matches any allowed pattern
+is_valid_url=false
+for allowed_pattern in "${allowed_urls[@]}"; do
+  if [[ "$chrome_url" =~ ^https?://$allowed_pattern ]]; then
+    is_valid_url=true
+    break
+  fi
+done
+
+if [ "$is_valid_url" = false ]; then
+  echo "❌ URL must match one of the allowed patterns:"
+  printf "  - %s\n" "${allowed_urls[@]}"
+  echo ""
   echo "Current URL: $chrome_url"
   exit 1
 fi
