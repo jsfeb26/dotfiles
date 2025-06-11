@@ -48,6 +48,7 @@ fi
 # Get the directory where this script is located
 script_dir=$(dirname "$0")
 
+
 # Find Node.js executable
 node_path=""
 for path in /usr/local/bin/node /opt/homebrew/bin/node /usr/bin/node ~/.nvm/versions/node/*/bin/node; do
@@ -68,6 +69,18 @@ if [ -z "$node_path" ]; then
   echo "  - brew install nvm && nvm install --lts"
   echo "  - brew install node"
   echo "  - Download from https://nodejs.org"
+  exit 1
+fi
+
+# Check if lz-string is installed locally in nodeScripts
+if [ ! -d "$script_dir/../nodeScripts/node_modules/lz-string" ]; then
+  echo "❌ lz-string package not installed locally!"
+  echo ""
+  echo "Please install dependencies by running:"
+  echo "  cd ~/dotfiles/raycast/nodeScripts && npm i"
+  echo ""
+  echo "Or install the specific package:"
+  echo "  npm install lz-string"
   exit 1
 fi
 
