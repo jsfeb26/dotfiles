@@ -1,0 +1,119 @@
+#!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Decode Query Params
+# @raycast.mode fullOutput
+
+# Optional parameters:
+# @raycast.icon 🔍
+# @raycast.packageName Ambient Scripts
+
+# Documentation:
+# @raycast.description Extracts and decompresses LZ-string encoded query parameters from current URL
+# @raycast.author jsfeb26
+# @raycast.authorURL https://raycast.com/jsfeb26
+
+# Check if Google Chrome is the frontmost app
+front_app=$(osascript -e 'tell application "System Events" to get name of first application process whose frontmost is true')
+if [ "$front_app" != "Google Chrome" ]; then
+  echo "❌ Google Chrome is not active."
+  exit 1
+fi
+
+# Get the active tab's URL
+chrome_url=$(osascript <<EOF
+tell application "Google Chrome"
+    set currentURL to URL of active tab of front window
+end tell
+return currentURL
+EOF
+)
+
+# Check if URL is from localhost:3000 or app.ambient.ai
+if [[ ! "$chrome_url" =~ ^https?://(localhost:3000|app\.ambient\.ai) ]]; then
+  echo "❌ URL must be from localhost:3000 or app.ambient.ai"
+  echo "Current URL: $chrome_url"
+  exit 1
+fi
+
+# Extract query string
+query_string=$(echo "$chrome_url" | grep -o '?.*' | sed 's/^?//')
+
+if [ -z "$query_string" ]; then
+  echo "❌ No query parameters found in URL"
+  exit 1
+fi
+
+# Get the directory where this script is located
+script_dir=$(dirname "$0")
+
+# Find Node.js executable
+node_path=""
+for path in /usr/local/bin/node /opt/homebrew/bin/node /usr/bin/node ~/.nvm/versions/node/*/bin/node; do
+  if [ -x "$path" ]; then
+    node_path="$path"
+    break
+  fi
+done
+
+# If not found in common locations, try to find it in PATH
+if [ -z "$node_path" ]; then
+  node_path=$(which node 2>/dev/null || echo "")
+fi
+
+if [ -z "$node_path" ]; then
+  echo "❌ Node.js not found. Please install Node.js or ensure it's in your PATH."
+  echo "Common installation methods:"
+  echo "  - brew install nvm && nvm install --lts"
+  echo "  - brew install node"
+  echo "  - Download from https://nodejs.org"
+  exit 1
+fi
+
+# Run the decompression script
+echo "🔍 Decoding query parameters..."
+echo "📋 URL: $chrome_url"
+echo ""
+echo "🔧 Running Node.js decoder (using: $node_path)..."
+
+# Capture both output and errors separately
+temp_output=$(mktemp)
+temp_error=$(mktemp)
+
+# "$node_path" "$script_dir/decode-query-params.js" "$query_string" > "$temp_output" 2> "$temp_error"
+"$node_path" "$script_dir/../nodeScripts/decode-query-params.js" "$query_string" > "$temp_output" 2> "$temp_error"
+exit_code=$?
+
+# Read the outputs
+decoded_json=$(cat "$temp_output")
+error_output=$(cat "$temp_error")
+
+# Show errors if any
+if [ -n "$error_output" ]; then
+  echo "⚠️  Node.js output/errors:"
+  echo "$error_output"
+  echo ""
+fi
+
+if [ $exit_code -eq 0 ] && [ -n "$decoded_json" ]; then
+  echo "✅ Decoded Parameters:"
+  echo "$decoded_json"
+  
+  # Copy to clipboard
+  echo "$decoded_json" | pbcopy
+  echo ""
+  echo "📋 JSON copied to clipboard!"
+else
+  echo "❌ Failed to decode query parameters (exit code: $exit_code)"
+  echo "Raw query string: $query_string"
+  
+  if [ -z "$decoded_json" ] && [ -z "$error_output" ]; then
+    echo "No output received from Node.js script"
+  fi
+fi
+
+# Clean up temp files
+rm -f "$temp_output" "$temp_error"
+
+ 
