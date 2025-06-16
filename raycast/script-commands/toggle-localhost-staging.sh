@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Open In Product Staging - Raycast Script
+# @raycast.title Toggle Localhost ↔ Product Staging - Raycast Script
 # @raycast.mode silent
 
 # Optional parameters:
@@ -10,7 +10,7 @@
 # @raycast.packageName Ambient Scripts
 
 # Documentation:
-# @raycast.description Opens the current localhost page in Product Staging
+# @raycast.description Toggles between localhost:3000 and product-staging.ambient.ai
 # @raycast.author jsfeb26
 # @raycast.authorURL https://raycast.com/jsfeb26
 
@@ -30,21 +30,29 @@ return currentURL
 EOF
 )
 
-# Only proceed if URL starts with localhost:3000
+# Check if URL is localhost:3000 and convert to staging
 if [[ "$chrome_url" =~ ^http://localhost:3000(/.*)?$ ]]; then
   path="${chrome_url#http://localhost:3000}"
-  staging_url="https://product-staging.ambient.ai$path"
+  new_url="https://product-staging.ambient.ai$path"
+  echo "Opening staging: $new_url"
+  
+# Check if URL is product-staging and convert to localhost
+elif [[ "$chrome_url" =~ ^https://product-staging\.ambient\.ai(/.*)?$ ]]; then
+  path="${chrome_url#https://product-staging.ambient.ai}"
+  new_url="http://localhost:3000$path"
+  echo "Opening localhost: $new_url"
+  
+else
+  echo "Not on localhost:3000 or product-staging.ambient.ai — skipping."
+  exit 0
+fi
 
-  # Open in new Chrome tab
-  osascript <<EOF
+# Open in new Chrome tab
+osascript <<EOF
 tell application "Google Chrome"
     tell front window
-        make new tab with properties {URL:"$staging_url"}
+        make new tab with properties {URL:"$new_url"}
     end tell
 end tell
 EOF
-else
-  echo "Not on localhost:3000 — skipping."
-  exit 0
-fi
 
