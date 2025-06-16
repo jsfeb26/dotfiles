@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Create Git Branch from Jira
+# @raycast.title Jira Create Branch - Raycast Script
 # @raycast.mode fullOutput
 
 # Optional parameters:

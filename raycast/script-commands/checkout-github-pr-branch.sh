@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Checkout GitHub PR Branch
+# @raycast.title GitHub Checkout PR Branch - Raycast Script
 # @raycast.mode fullOutput
 
 # Optional parameters:

@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Open In Product Staging
+# @raycast.title Open In Product Staging - Raycast Script
 # @raycast.mode silent
 
 # Optional parameters:

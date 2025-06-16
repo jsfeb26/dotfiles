@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Decode Query Params
+# @raycast.title Decode Query Params - Raycast Script
 # @raycast.mode fullOutput
 
 # Optional parameters:

@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Restart the Dock
+# @raycast.title Restart the Dock - Raycast Script
 # @raycast.mode silent
 # @raycast.packageName System
 
