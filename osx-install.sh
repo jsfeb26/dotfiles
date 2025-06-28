@@ -99,6 +99,7 @@ brew install --cask ghostty
 brew install --cask notion
 brew install --cask notion-calendar
 brew install --cask notunes
+brew install --cask nordvpn
 # Need to install specific version if transferring license
 # brew install --cask iris
 
