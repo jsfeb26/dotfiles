@@ -1,5 +1,5 @@
 module.exports = {
-  defaultBrowser: "arc",
+  defaultBrowser: "dia",
   handlers: [
     {
       // All GitHub links
