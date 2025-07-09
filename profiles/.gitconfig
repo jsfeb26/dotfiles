@@ -13,6 +13,10 @@
   open = browse -- .
   # Delete all local branches except main
   dasm = !git branch | grep -v "main" | xargs git branch -D
+  # Creates a new branch based on origin/main
+  cob = "!f() { git checkout -b \"$1\" origin/main; }; f"
+  # Pushes the current branch to remote origin. Validates that you're not on a detached HEAD.
+  pb = "!b=$(git rev-parse --abbrev-ref HEAD); if [ \"$b\" = \"HEAD\" ]; then echo 'Jason: Refusing to push from detached HEAD'; exit 1; else git push origin $b; fi"
 [user]
   email = jsfeb26@gmail.com
   name = Jason Stinson
