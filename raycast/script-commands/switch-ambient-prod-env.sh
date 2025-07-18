@@ -18,6 +18,7 @@
 ambient_domains=(
     "app.ambient.ai"
     "beta.ambient.ai"
+    "main.ambient.ai"
     "prerelease.ambient.ai"
     "product.prod.ambient.ai"
     "product-beta.ambient.ai"
@@ -33,6 +34,9 @@ case "$target_env" in
     "beta")
         base_url="https://beta.ambient.ai"
         ;;
+    "main")
+        base_url="https://main.ambient.ai"
+        ;;
     "prerelease")
         base_url="https://prerelease.ambient.ai"
         ;;
@@ -44,7 +48,7 @@ case "$target_env" in
         ;;
     *)
         echo "Invalid environment: $target_env"
-        echo "Valid environments: app, beta, prerelease, internal, product-beta"
+        echo "Valid environments: app, beta, prerelease, internal, product-beta, main"
         exit 1
         ;;
 esac
