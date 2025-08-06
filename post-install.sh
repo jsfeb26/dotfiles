@@ -6,6 +6,12 @@ printf "\e[42m Installing Additional Things \e[0m\n"
 nvm install stable
 nvm alias default stable
 
+printf "\e[42m Installing Claude Code \e[0m\n"
+npm install -g @anthropic-ai/claude-code
+git -C ~/dev clone https://github.com/contains-studio/agents.git
+cp -rn ~/dev/agents/* ~/.claude/agents/
+# Remove README.md because it's getting copied over with the actual agents
+[ -f ~/.claude/agents/README.md ] && rm ~/.claude/agents/README.md
 
 # TODO: Remove if antigen handles this
 # sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
