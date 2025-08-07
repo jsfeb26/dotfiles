@@ -136,3 +136,5 @@ for func in ~/dotfiles/scripts/*.zsh; do
   source $func
 done
 
+# For Cursor Agent
+export PATH="$HOME/.local/bin:$PATH"

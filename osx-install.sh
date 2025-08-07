@@ -119,6 +119,10 @@ cp -R ~/dotfiles/fonts/. ~/Library/Fonts/
 printf "\e[42m Creating dev Directory \e[0m\n"
 mkdir ~/dev
 
+printf "\e[42m Installing Cursor \e[0m\n"
+brew install --cask cursor
+curl https://cursor.com/install -fsS | bash # agent
+
 printf "\e[42m Installing \e[0m\n"
 brew install zsh
 brew install starship
