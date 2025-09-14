@@ -136,5 +136,80 @@ for func in ~/dotfiles/scripts/*.zsh; do
   source $func
 done
 
+dotfiles() {
+  cursor ~/dotfiles
+}
+
 # For Cursor Agent
 export PATH="$HOME/.local/bin:$PATH"
+
+# bun completions
+[ -s "/Users/jasonstinson/.bun/_bun" ] && source "/Users/jasonstinson/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Alias for claude with opus model
+alias opus='ENABLE_BACKGROUND_TASKS=1 claude --model opus'
+
+# The "$@" is a zsh thing that allows you to pass all the arguments to the function
+dopus() {
+  opus --dangerously-skip-permissions "$@"
+}
+
+popus() {
+  opus "$(pbpaste) --- $@"
+}
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"
+
+# Prevent accidental global Claude Code installs via npm because they go in nvm
+# which means if I change node versions it won't work
+npm() {
+  if [[ "$1" == "install" && ( "$2" == "-g" || "$2" == "--global" ) && "$3" == "@anthropic-ai/claude-code"* ]]; then
+    echo "🚫 Global Claude Code install blocked!"
+    echo "Use your local install at ~/.claude/local instead."
+    echo "Run 'claude-install' to install locally."
+    return 1
+  fi
+  command npm "$@"
+}
+
+claude-install() {
+  echo "📦 Installing Claude Code locally (safe, NVM-proof)..."
+
+  # Step 1: Create install directory
+  mkdir -p "$HOME/.claude/local"
+
+  # Step 2: Install latest Claude Code into it
+  npm install --prefix "$HOME/.claude/local" @anthropic-ai/claude-code@latest
+
+  # Step 3: Create bin directory + symlink
+  mkdir -p "$HOME/.claude/bin"
+  ln -sf "$HOME/.claude/local/node_modules/.bin/claude" "$HOME/.claude/bin/claude"
+
+  # Step 4: Ensure PATH contains ~/.claude/bin
+  if ! echo "$PATH" | grep -q "$HOME/.claude/bin"; then
+    echo 'export PATH="$HOME/.claude/bin:$PATH"' >> "$HOME/.zshrc"
+    echo 'export PATH="$HOME/.claude/bin:$PATH"' >> "$HOME/.zprofile"
+    echo "✅ Added ~/.claude/bin to PATH (restart your shell to apply)"
+  fi
+
+  # Step 5: Done
+  echo "✅ Claude Code installed locally."
+  echo "   Version: $(claude --version)"
+  echo "   Path: $(which claude)"
+  echo "   Run: claude doctor"
+}
+
+claude-update() {
+  echo "🔧 Updating Claude Code Version: $(claude --version)"
+  npm install --prefix "$HOME/.claude/local" @anthropic-ai/claude-code@latest
+  echo "✅ Updated Claude Code to Version: $(claude --version)"
+}
+
+export PATH="$HOME/.claude/bin:$PATH"
+
