@@ -13,6 +13,15 @@ cp -rn ~/dev/agents/* ~/.claude/agents/
 # Remove README.md because it's getting copied over with the actual agents
 [ -f ~/.claude/agents/README.md ] && rm ~/.claude/agents/README.md
 
+npx -y @owloops/claude-powerline --install-fonts
+
+# Install Codex
+npm install -g @openai/codex@latest
+
+printf "\e[42m Login to atuin will be prompted for password and key \e[0m\n"
+atuin login -u jsfeb26
+
+
 # TODO: Remove if antigen handles this
 # sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 # brew install zsh-syntax-highlighting

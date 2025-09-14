@@ -112,6 +112,7 @@ mas install 413564952     # Home Inventory
 mas install 904280696     # Things3
 # mas install 457622435     # Yoink
 # mas install 1485052491  # Dropzone 4
+brew install dagger/tap/container-use
 
 printf "\e[42m Installing Fonts \e[0m\n"
 cp -R ~/dotfiles/fonts/. ~/Library/Fonts/
@@ -122,6 +123,15 @@ mkdir ~/dev
 printf "\e[42m Installing Cursor \e[0m\n"
 brew install --cask cursor
 curl https://cursor.com/install -fsS | bash # agent
+
+curl -fsSL https://bun.sh/install | bash
+npm install -g ccusage
+
+printf "\e[42m Installing atuin for terminal history  \e[0m\n"
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+
+# Install uv for python package manager
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 printf "\e[42m Installing \e[0m\n"
 brew install zsh
