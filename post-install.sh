@@ -6,13 +6,14 @@ printf "\e[42m Installing Additional Things \e[0m\n"
 nvm install stable
 nvm alias default stable
 
-printf "\e[42m Installing Claude Code \e[0m\n"
-npm install -g @anthropic-ai/claude-code
+printf "\e[42m Setting up additional Claude Code tools \e[0m\n"
+# Note: Using native install of Claude Code to avoid multiple instances based on which node version
+# npm install -g @anthropic-ai/claude-code
+npm install -g ccusage
 git -C ~/dev clone https://github.com/contains-studio/agents.git
 cp -rn ~/dev/agents/* ~/.claude/agents/
 # Remove README.md because it's getting copied over with the actual agents
 [ -f ~/.claude/agents/README.md ] && rm ~/.claude/agents/README.md
-
 npx -y @owloops/claude-powerline --install-fonts
 
 # Install Codex

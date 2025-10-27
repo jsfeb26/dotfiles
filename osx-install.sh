@@ -124,8 +124,17 @@ printf "\e[42m Installing Cursor \e[0m\n"
 brew install --cask cursor
 curl https://cursor.com/install -fsS | bash # agent
 
+printf "\e[42m Installing Factory (Droid) \e[0m\n"
+curl -fsSL https://app.factory.ai/cli | sh # factory (droid)
+
+
+printf "\e[42m Installing Claude Code \e[0m\n"
+# native install to avoid multiple instances based on which node version
+curl -fsSL https://claude.ai/install.sh | bash
+
+printf "\e[42m Installing Bun \e[0m\n"
+brew install oven-sh/bun/bun
 curl -fsSL https://bun.sh/install | bash
-npm install -g ccusage
 
 printf "\e[42m Installing atuin for terminal history  \e[0m\n"
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
