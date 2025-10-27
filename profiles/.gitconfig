@@ -15,8 +15,9 @@
   dasm = !git branch | grep -v "main" | xargs git branch -D
   # Creates a new branch based on origin/main
   cob = "!f() { git checkout -b \"$1\" origin/main; }; f"
-  # Pushes the current branch to remote origin. Validates that you're not on a detached HEAD.
-  pb = "!b=$(git rev-parse --abbrev-ref HEAD); if [ \"$b\" = \"HEAD\" ]; then echo 'Jason: Refusing to push from detached HEAD'; exit 1; else git push origin $b; fi"
+  # Push current branch; escalate to friendly force push prompt when needed
+  pb = !~/dotfiles/scripts/push_branch.sh
+
 [user]
   email = jsfeb26@gmail.com
   name = Jason Stinson
@@ -57,3 +58,5 @@
 [maintenance]
 	# repo = /Users/jstinson/ambient/src/product
 	repo = /Users/jasonstinson/dev/ambient/product
+[coderabbit]
+	machineId = cli/6cec4b5b795149f381dd502ca6bfad7d
