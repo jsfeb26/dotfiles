@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__deepwiki__ask_question",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_click",
+      "WebFetch(domain:github.com)",
+      "WebFetch (domain:docs.anthropic.com)",
+      "WebFetch (*)",
+      "Bash(git add:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run dev)",
+      "Bash(~/.claude-code-docs/claude-docs-helper.sh:*)"
+    ],
+    "deny": [],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/custom-commands/play.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude-code-docs/claude-docs-helper.sh hook-check"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
+  },
+  "alwaysThinkingEnabled": true
+}

@@ -131,6 +131,8 @@ curl -fsSL https://app.factory.ai/cli | sh # factory (droid)
 printf "\e[42m Installing Claude Code \e[0m\n"
 # native install to avoid multiple instances based on which node version
 curl -fsSL https://claude.ai/install.sh | bash
+# In case this doesn't get created in time we will create it so we can symlink the ./claude/settings.json
+mkdir -p ~/.claude
 
 printf "\e[42m Installing Bun \e[0m\n"
 brew install oven-sh/bun/bun
@@ -167,6 +169,8 @@ printf "\e[42m Symlinking Profiles \e[0m\n"
 [ ! -e ~/iterm ] || rm -rf ~/iterm
 [ ! -e ~/.config/starship.toml ] || rm -rf ~/.config/starship.toml
 [ ! -e ~/.finicky.js ] || rm -rf ~/.finicky.js
+[ ! -e ~/.claude/settings.json ] || rm -rf ~/.claude/settings.json
+[ ! -e ~/.claude/custom-commands ] || rm -rf ~/.claude/custom-commands
 
 ln -s ~/dotfiles/profiles/.zshrc ~/
 ln -s ~/dotfiles/profiles/.vimrc ~/
@@ -177,6 +181,10 @@ ln -s ~/dotfiles/profiles/.tmux.conf.local ~/
 ln -s ~/dotfiles/profiles/iterm ~/
 ln -s ~/dotfiles/.config/starship.toml ~/.config/
 ln -s ~/dotfiles/profiles/.finicky.js ~/
+ln -s ~/dotfiles/claude/settings.json ~/.claude/settings.json
+ln -s ~/dotfiles/claude/custom-commands ~/.claude/custom-commands
+
+cp ~/dotfiles/claude/custom-commands/.labs.example ~/.claude/custom-commands/.labs
 
 figlet "Great Success!!!"
 
