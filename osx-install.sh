@@ -135,8 +135,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 mkdir -p ~/.claude
 
 printf "\e[42m Installing Bun \e[0m\n"
-brew install oven-sh/bun/bun
-curl -fsSL https://bun.sh/install | bash
+curl -fsSL https://bun.com/install | bash
 
 printf "\e[42m Installing atuin for terminal history  \e[0m\n"
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh

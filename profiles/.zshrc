@@ -143,12 +143,12 @@ dotfiles() {
 # For Cursor Agent
 export PATH="$HOME/.local/bin:$PATH"
 
-# bun completions
-[ -s "/Users/jasonstinson/.bun/_bun" ] && source "/Users/jasonstinson/.bun/_bun"
 
-# bun
+# Add the Bun directory to PATH
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+# bun completions
+[ -s "/Users/jasonstinson/.bun/_bun" ] && source "/Users/jasonstinson/.bun/_bun"
 
 # Alias for claude with opus model
 alias opus='ENABLE_BACKGROUND_TASKS=1 claude --model opus'
