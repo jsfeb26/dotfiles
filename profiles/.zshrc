@@ -165,3 +165,7 @@ popus() {
 . "$HOME/.atuin/bin/env"
 
 eval "$(atuin init zsh)"
+
+# make temp directory my own so npx convex dev can work without permission error
+# Unexpected Error: Error: EACCES: permission denied, mkdtemp '/var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/convexXXXXXX'
+export TMPDIR=/tmp
