@@ -17,6 +17,8 @@
   cob = "!f() { git checkout -b \"$1\" origin/main; }; f"
   # Push current branch; escalate to friendly force push prompt when needed
   pb = !~/dotfiles/scripts/push_branch.sh
+  # Switch back to the previous branch
+  z = !~/dotfiles/scripts/switch_previous_branch.sh
 
 [user]
   email = jsfeb26@gmail.com
