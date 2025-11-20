@@ -115,7 +115,7 @@ fpath=($fpath "/Users/jasonstinson/.zfunctions")
 # For a full list of active aliases, run `alias`.
 # alias gl='git log --graph --pretty=format:'\''%Cred%h%Creset - %Cgreen[%an]%Creset%C(yellow)%d%Creset: %s %Cgreen(%cr)%Creset'\'' --abbrev-commit --date=relative'
 alias alias-list='cat ~/.zshrc | grep "alias" | grep -v "^#"'
-alias gitd="$HOME/dotfiles/scripts/deleteOldBranches.sh"
+alias gitd="$HOME/dotfiles/scripts/deleteBranches.sh"
 alias gitstashd="$HOME/dotfiles/scripts/deleteOldStashes.sh"
 
 # Add syntax highlighting
