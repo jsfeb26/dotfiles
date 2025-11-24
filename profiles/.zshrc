@@ -117,6 +117,7 @@ fpath=($fpath "/Users/jasonstinson/.zfunctions")
 alias alias-list='cat ~/.zshrc | grep "alias" | grep -v "^#"'
 alias gitd="$HOME/dotfiles/scripts/deleteBranches.sh"
 alias gitstashd="$HOME/dotfiles/scripts/deleteOldStashes.sh"
+alias gitsb='  git checkout $(git br | fzf)'
 
 # Add syntax highlighting
 # source /Users/jasonstinson/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -169,3 +170,6 @@ eval "$(atuin init zsh)"
 # make temp directory my own so npx convex dev can work without permission error
 # Unexpected Error: Error: EACCES: permission denied, mkdtemp '/var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/convexXXXXXX'
 export TMPDIR=/tmp
+
+# Added by Antigravity
+export PATH="/Users/jasonstinson/.antigravity/antigravity/bin:$PATH"
