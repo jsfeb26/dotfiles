@@ -61,6 +61,7 @@ brew install figlet
 # curl -o- -L https://yarnpkg.com/install.sh | bash
 
 brew install fzf
+brew install bat # better cat with syntax highlighting
 # brew install highlight
 # brew install markdown
 # brew install grep, args: ["with-default-names"]
