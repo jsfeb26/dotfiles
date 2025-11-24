@@ -12,7 +12,7 @@
   cp = cherry-pick
   open = browse -- .
   # Delete all local branches except main
-  dasm = !git branch | grep -v "main" | xargs git branch -D
+  # dasm = !git branch | grep -v "main" | xargs git branch -D
   # Creates a new branch based on origin/main
   cob = "!f() { git checkout -b \"$1\" origin/main; }; f"
   # Push current branch; escalate to friendly force push prompt when needed
