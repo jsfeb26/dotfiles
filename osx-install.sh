@@ -91,7 +91,9 @@ brew install cleanshot
 brew install bartender
 brew install cleanmymac
 brew install istat-menus
-brew install keyboardcleantool
+# brew install keyboardcleantool
+# If this doesn't work check Dropbox/Apps for dmg or search in email for download link
+brew install --cask cleanupbuddy
 brew install finicky
 # Allows for screensharing a smaller portion of your screen
 brew install deskpad
