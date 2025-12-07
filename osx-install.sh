@@ -97,6 +97,8 @@ brew install --cask cleanupbuddy
 brew install finicky
 # Allows for screensharing a smaller portion of your screen
 brew install deskpad
+# Used for managing Uperfect 3k Monitor to make the text sharp and crisp
+brew install --cask betterdisplay
 brew install --cask notchnook
 brew install --cask ghostty
 brew install --cask notion
