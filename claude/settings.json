@@ -45,5 +45,9 @@
     "type": "command",
     "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
   },
+  "enabledPlugins": {
+    "frontend-design@claude-code-plugins": true,
+    "code-simplifier@claude-plugins-official": true
+  },
   "alwaysThinkingEnabled": true
 }
