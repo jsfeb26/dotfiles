@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Finds all stashes that are older than one month and ask the user to confirm the deletion
+# Finds all stashes that are older than three months and ask the user to confirm the deletion
 # If the script has permission errors make it executable by running:
 # chmod +x scripts/deleteOldStashes.sh
 
-# Calculate the Unix timestamp for one month ago (macOS compatible)
-cutoff_timestamp=$(date -j -v-1m +%s)
+# Calculate the Unix timestamp for three months ago (macOS compatible)
+cutoff_timestamp=$(date -j -v-3m +%s)
 
 declare -a stashes_to_delete
 
@@ -33,7 +33,7 @@ done < <(git stash list --format='%gd %ct %gs')
 
 # Check if any stashes were marked for deletion
 if [ ${#stashes_to_delete[@]} -eq 0 ]; then
-    echo "No stashes older than one month found."
+    echo "No stashes older than three months found."
     exit 0
 fi
 

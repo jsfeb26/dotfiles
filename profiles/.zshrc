@@ -153,6 +153,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Alias for claude with opus model
 alias opus='ENABLE_BACKGROUND_TASKS=1 claude --model opus'
+# alias claude-danger="/Users/jasonstinson/.local/bin/claude —dangerously-skip-permissions"
+# alias claude-danger="claude --model opus --dangerously-skip-permissions"
+alias claude-danger="claude --dangerously-skip-permissions"
 
 # The "$@" is a zsh thing that allows you to pass all the arguments to the function
 dopus() {
