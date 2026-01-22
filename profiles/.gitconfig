@@ -21,6 +21,8 @@
   z = !~/dotfiles/scripts/switch_previous_branch.sh
   # Delete all worktrees created by Cursor
 	rwt = "!git worktree list | awk \"{print \\$1}\" | grep \"\\.cursor/worktrees\" | xargs -I{} git worktree remove --force {} ; git worktree list"
+  # Which Branch - Find which remote branch(es) contain a commit
+  wb = !~/dotfiles/scripts/find_commit_branch.sh
 
 [user]
   email = jsfeb26@gmail.com
