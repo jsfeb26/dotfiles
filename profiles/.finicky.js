@@ -52,6 +52,11 @@ module.exports = {
       browser: "Google Chrome",
     },
     {
+      // AWS Apps (SSO, WorkDocs, etc.)
+      match: /^https:\/\/.*\.awsapps\.com\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
       // Google Docs
       match: /^https:\/\/docs\.google\.com\/.*$/,
       browser: "Google Chrome",
