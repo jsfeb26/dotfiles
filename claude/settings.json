@@ -5,16 +5,26 @@
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_console_messages",
       "mcp__playwright__browser_click",
-      "WebFetch(domain:github.com)",
-      "WebFetch (domain:docs.anthropic.com)",
-      "WebFetch (*)",
+      "WebFetch",
+      "WebSearch",
       "Bash(git add:*)",
       "Bash(npm install:*)",
       "Bash(npm run lint)",
       "Bash(npm run dev)",
       "Bash(~/.claude-code-docs/claude-docs-helper.sh:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -rf /*:*)",
+      "Bash(rm -rf ~/*:*)",
+      "Bash(sudo rm -rf:*)",
+      "Bash(mkfs:*)",
+      "Bash(dd if=* of=/dev/*:*)"
+    ],
+    "ask": [
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)"
+    ],
     "defaultMode": "acceptEdits"
   },
   "hooks": {
@@ -36,6 +46,36 @@
           {
             "type": "command",
             "command": "~/.claude-code-docs/claude-docs-helper.sh hook-check"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME\"/.claude/hooks/damage-control/bash-tool-damage-control.ts",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME\"/.claude/hooks/damage-control/edit-tool-damage-control.ts",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME\"/.claude/hooks/damage-control/write-tool-damage-control.ts",
+            "timeout": 5
           }
         ]
       }
