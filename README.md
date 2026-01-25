@@ -121,6 +121,22 @@ Host *
 
 - Open vim and run `:PlugInstall`
 
+### Claude Code
+
+#### Install Claude Code Damage Control
+
+- Run `cd ~/dev/claude-code-damage-control && claude`
+- Run `/install`
+- Choose Global Install
+- Choose to Merge into Existing Settings
+- Choose Typescript and Bun setup
+- Continue accepting defaults
+
+#### Install Claude Code Agents
+
+- Run `cd ~/dev/agents && claude`
+- Run `/install` and follow the steps
+
 ### Configure Raycast
 
 - Integrate with 1Password CLI
