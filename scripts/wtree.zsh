@@ -1,35 +1,35 @@
 # wtree: Create a new worktree for each given branch.
-# Usage: wtree [ -p|--pnpm | -n|--npm ] branch1 branch2 ...
+# Usage: wtree [-s|--setup] [-r|--run] [--pm npm|pnpm] branch1 branch2 ...
 #
-# This function does the following:
-#   1. Parses command-line arguments; if -p/--pnpm is provided, it will later run "pnpm install".
-#   2. Determines the current branch and repository root.
-#   3. Uses a fixed parent directory (~/dev) to house all worktree directories.
-#   4. For each branch passed:
-#        - If the branch does not exist, it is created from the current branch.
-#        - It checks that a worktree for that branch does not already exist.
-#        - It then creates a worktree in ~/dev using a naming convention: <repoName>-<branch>.
-#        - If the install-deps flag is true, it runs "pnpm install" inside the new worktree.
-#        - Finally, it either opens the new worktree via the custom "cursor" command (if defined)
-#          or prints its path.
+# Flags:
+#   -s, --setup    Copy .env from main repo and install dependencies
+#   -r, --run      Implies --setup, plus starts dev server on port 3001 (single branch only)
+#   --pm <manager> Package manager to use (npm or pnpm, default: npm)
+#
+# Creates worktrees as siblings to the repo: <repoName>-<branch>
+# Opens Cursor automatically after creating the worktree.
 wtree() {
-  # Flag to determine whether to run "pnpm install" or "npm install"
-  local install_deps=false
+  # Flags
+  local setup=false
+  local run_app=false
   local package_manager="npm"
   local branches=()
 
   # Parse command-line arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -p|--pnpm)
-        install_deps=true
-        package_manager="pnpm"
+      -s|--setup)
+        setup=true
         shift
         ;;
-      -n|--npm)
-        install_deps=true
-        package_manager="npm"
+      -r|--run)
+        run_app=true
+        setup=true
         shift
+        ;;
+      --pm)
+        package_manager="$2"
+        shift 2
         ;;
       *)
         branches+=("$1")
@@ -40,7 +40,13 @@ wtree() {
 
   # Ensure at least one branch name is provided.
   if [[ ${#branches[@]} -eq 0 ]]; then
-    echo "Usage: wtree [ -p|--pnpm | -n|--npm ] branch1 branch2 ..."
+    echo "Usage: wtree [-s|--setup] [-r|--run] [--pm npm|pnpm] branch1 branch2 ..."
+    return 1
+  fi
+
+  # -r/--run only works with a single branch
+  if $run_app && [[ ${#branches[@]} -gt 1 ]]; then
+    echo "Error: --run flag only works with a single branch."
     return 1
   fi
 
@@ -94,10 +100,11 @@ wtree() {
       continue
     fi
 
-    # If the branch does not exist, create it from the current branch.
+    # If the branch does not exist, create it from origin/main.
     if ! git show-ref --verify --quiet "refs/heads/${branch}"; then
-      echo "Branch '${branch}' does not exist. Creating it from '${current_branch}'..."
-      if ! git branch "${branch}"; then
+      echo "Branch '${branch}' does not exist. Creating it from 'origin/main'..."
+      git fetch origin main --quiet
+      if ! git branch "${branch}" origin/main; then
         echo "Error: Failed to create branch '${branch}'. Skipping."
         continue
       fi
@@ -110,19 +117,31 @@ wtree() {
       continue
     fi
 
-    # If the install flag is set, run package manager install in the new worktree
-    if $install_deps; then
-      echo "Installing dependencies in worktree for branch '${branch}' using ${package_manager}..."
-      if ! ( cd "$target_path" && $package_manager install ); then
-        echo "Warning: Failed to install dependencies in '${target_path}'."
-      fi
-    fi
-
-    # Optionally, open the worktree directory via a custom "cursor" command if available.
+    # Open Cursor immediately (before install so you can start looking at code)
     if type cursor >/dev/null 2>&1; then
       cursor "$target_path"
     else
       echo "Worktree created at: ${target_path}"
+    fi
+
+    # Handle setup and run flags
+    if $setup; then
+      cd "$target_path" || return 1
+
+      # Copy .env from main repo
+      if [[ -f "$repo_root/.env" ]]; then
+        echo "Copying .env from main repo..."
+        cp "$repo_root/.env" "$target_path/.env"
+      fi
+
+      # Install dependencies
+      echo "Installing dependencies using ${package_manager}..."
+      $package_manager install
+
+      # Start dev server if run flag is set
+      if $run_app; then
+        npm start -- --port 3001
+      fi
     fi
 
     echo "Worktree for branch '${branch}' created successfully."
