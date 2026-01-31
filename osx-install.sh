@@ -56,6 +56,7 @@ brew install ack
 brew install tree
 brew install tldr
 brew install figlet
+brew install gum # for interactive CLI prompts
 # installing yarn with curl because brew get's latest node and I'm using nvm for that
 # TODO: Figure out how to install yarn 2+
 # curl -o- -L https://yarnpkg.com/install.sh | bash

@@ -3,7 +3,7 @@
 #        wtdel -a|--all     Delete all worktrees
 #
 # If no argument is provided, deletes the current worktree you're in (with confirmation).
-# --all requires confirmation. Explicit branch name does not require confirmation.
+# Uses gum for interactive prompts.
 # Automatically CDs back to the main repo after deletion.
 wtdel() {
   local delete_all=false
@@ -22,15 +22,6 @@ wtdel() {
         ;;
     esac
   done
-
-  # Helper function for confirmation
-  _confirm() {
-    local prompt="$1"
-    local response
-    echo -n "$prompt [y/N] "
-    read -r response
-    [[ "$response" =~ ^[Yy]$ ]]
-  }
 
   # Get main repo info
   local git_common_dir repo_root repo_name worktree_parent
@@ -66,34 +57,47 @@ wtdel() {
       return 0
     fi
 
-    # List worktrees and confirm
-    echo "The following worktrees will be deleted:"
+    # Build list of worktree names for selection
+    local wt_names=()
     for wt in "${worktrees[@]}"; do
-      echo "  - $(basename "$wt")"
+      wt_names+=("$(basename "$wt")")
     done
-    echo ""
-    if ! _confirm "Delete all ${#worktrees[@]} worktree(s)?"; then
+
+    # Multi-select which worktrees to delete
+    echo "Select worktrees to delete:"
+    local selected
+    selected=$(printf '%s\n' "${wt_names[@]}" | gum choose --no-limit --header "Space to select, Enter to confirm")
+    
+    if [[ -z "$selected" ]]; then
       echo "Cancelled."
       return 0
     fi
 
+    # Ask about branch deletion
+    local delete_branches
+    delete_branches=$(gum choose "Delete worktrees only" "Delete worktrees + branches")
+
     # CD to main repo first
     cd "$repo_root" || return 1
 
-    for wt in "${worktrees[@]}"; do
-      local wt_branch=$(basename "$wt")
-      wt_branch=${wt_branch#${repo_name}-}
+    # Delete selected worktrees
+    while IFS= read -r wt_name; do
+      [[ -z "$wt_name" ]] && continue
+      local wt_path="$worktree_parent/$wt_name"
+      local wt_branch=${wt_name#${repo_name}-}
 
-      echo "Removing worktree: ${wt}..."
-      git worktree remove "$wt" --force
+      echo "Removing worktree: ${wt_name}..."
+      git worktree remove "$wt_path" --force
 
-      # Delete the branch (but not main/master)
-      if [[ "$wt_branch" != "main" && "$wt_branch" != "master" ]]; then
-        git branch -D "$wt_branch" 2>/dev/null && echo "Deleted branch: ${wt_branch}"
+      # Delete the branch if requested (but not main/master)
+      if [[ "$delete_branches" == "Delete worktrees + branches" ]]; then
+        if [[ "$wt_branch" != "main" && "$wt_branch" != "master" ]]; then
+          git branch -D "$wt_branch" 2>/dev/null && echo "Deleted branch: ${wt_branch}"
+        fi
       fi
-    done
+    done <<< "$selected"
 
-    echo "All worktrees deleted."
+    echo "Done."
     return 0
   fi
 
@@ -133,14 +137,21 @@ wtdel() {
   fi
 
   # Confirm if deleting current worktree (no explicit branch provided)
+  local delete_branch_choice="Delete worktrees only"
   if [[ -z "$branch" ]]; then
-    echo "Will delete current worktree:"
-    echo "  - $(basename "$target_path") (branch: ${target_branch})"
+    echo "Worktree: $(basename "$target_path")"
+    echo "Branch: ${target_branch}"
     echo ""
-    if ! _confirm "Proceed?"; then
+    
+    delete_branch_choice=$(gum choose "Delete worktree only" "Delete worktree + branch" "Cancel")
+    
+    if [[ "$delete_branch_choice" == "Cancel" ]]; then
       echo "Cancelled."
       return 0
     fi
+  else
+    # Explicit branch provided - ask about branch deletion
+    delete_branch_choice=$(gum choose "Delete worktree only" "Delete worktree + branch")
   fi
 
   # CD to main repo before deleting
@@ -148,7 +159,7 @@ wtdel() {
   cd "$repo_root" || return 1
 
   # Remove worktree
-  echo "Removing worktree: ${target_path}..."
+  echo "Removing worktree: $(basename "$target_path")..."
   if git worktree remove "$target_path" --force; then
     echo "Worktree removed."
   else
@@ -156,9 +167,11 @@ wtdel() {
     return 1
   fi
 
-  # Delete the branch (but not main/master)
-  if [[ "$target_branch" != "main" && "$target_branch" != "master" ]]; then
-    git branch -D "$target_branch" 2>/dev/null && echo "Deleted branch: ${target_branch}"
+  # Delete the branch if requested (but not main/master)
+  if [[ "$delete_branch_choice" == "Delete worktree + branch" ]]; then
+    if [[ "$target_branch" != "main" && "$target_branch" != "master" ]]; then
+      git branch -D "$target_branch" 2>/dev/null && echo "Deleted branch: ${target_branch}"
+    fi
   fi
 
   echo "Done. You're now in: $(pwd)"
