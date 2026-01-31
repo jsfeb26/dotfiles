@@ -164,6 +164,8 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
+git clone https://github.com/disler/claude-code-damage-control ~/dev/claude-code-damage-control
+
 printf "\e[42m Symlinking Profiles \e[0m\n"
 [ ! -e ~/.zshrc ] || rm ~/.zshrc
 [ ! -e ~/.vimrc ] || rm ~/.vimrc
