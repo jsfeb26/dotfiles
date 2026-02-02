@@ -124,10 +124,11 @@ wtree() {
       echo "Worktree created at: ${target_path}"
     fi
 
+    # Change to the new worktree directory
+    cd "$target_path" || return 1
+
     # Handle setup and run flags
     if $setup; then
-      cd "$target_path" || return 1
-
       # Copy .env from main repo
       if [[ -f "$repo_root/.env" ]]; then
         echo "Copying .env from main repo..."
