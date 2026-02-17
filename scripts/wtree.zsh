@@ -12,7 +12,7 @@ wtree() {
   # Flags
   local setup=false
   local run_app=false
-  local package_manager="npm"
+  local package_manager="pnpm"
   local branches=()
 
   # Parse command-line arguments
@@ -141,7 +141,7 @@ wtree() {
 
       # Start dev server if run flag is set
       if $run_app; then
-        npm start -- --port 3001
+        $package_manager start -- --port 3001
       fi
     fi
 
