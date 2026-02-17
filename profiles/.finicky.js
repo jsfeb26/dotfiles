@@ -61,5 +61,10 @@ module.exports = {
       match: /^https:\/\/docs\.google\.com\/.*$/,
       browser: "Google Chrome",
     },
+    {
+      // OpenAI auth
+      match: /^https:\/\/auth\.openai\.com\/.*$/,
+      browser: "Google Chrome",
+    },
   ],
 };
