@@ -2,6 +2,9 @@ ZSH_DISABLE_COMPFIX="true"                                           # Disable z
 # ZSH_TMUX_AUTOSTART='true'                                            # make tmux start every time shell starts  
 DEFAULT_USER="jasonstinson"                                              # need to set to use to get rid of long prompt
 
+# ===========================  Paths  =========================================================================
+OBSIDIAN_SECOND_BRAIN="$HOME/Dropbox/Obsidian Vaults/Agentic Second Brain"
+
 export ZSH=/Users/jasonstinson/.oh-my-zsh                                # Path to your oh-my-zsh installation.
 export LANG=en_US.UTF-8                                              # Set language environment
 
@@ -170,6 +173,10 @@ eval "$(atuin init zsh)"
 # make temp directory my own so npx convex dev can work without permission error
 # Unexpected Error: Error: EACCES: permission denied, mkdtemp '/var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/convexXXXXXX'
 export TMPDIR=/tmp
+
+ccbrain() {
+  cd "$OBSIDIAN_SECOND_BRAIN" && claude
+}
 
 # Added by Antigravity
 export PATH="/Users/jasonstinson/.antigravity/antigravity/bin:$PATH"
