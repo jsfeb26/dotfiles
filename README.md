@@ -153,7 +153,10 @@ Mission Control Settings
 General Settings
 - Dock
 Dock Settings
-- [Optional] set key repeat `defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false`
+- [Optional] set key repeat
+  - macOS Tahoe and newer: `defaults write -g ApplePressAndHoldEnabled -bool false`
+  - Older macOS: `defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false`
+  - (`-g` is shorthand for `NSGlobalDomain`; both should work, but `-g` is the more modern form)
 
 ### Iris
 
