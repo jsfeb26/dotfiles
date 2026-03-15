@@ -1,19 +1,112 @@
 # Dev Setup
 
-1. Install xcode run `xcode-select --install`
-2. Download [1Password](https://1password.com/downloads/mac/) and setup another device on existing computer
-3. ~~[Create a Rosetta version of terminal](https://osxdaily.com/2020/11/18/how-run-homebrew-x86-terminal-apple-silicon-mac/)~~
-4. Clone dotfiles in home directory `git clone https://github.com/jsfeb26/dotfiles.git`
-5. Sign into App Store
-6. Run `bash ~/dotfiles/osx-install.sh {username}`
-7. Change all settings from "jasonstinson" to `{username}
-8. Run `bash ~/dotfiiles/post-install.sh`
-9. If you get `Zsh detects insecure completion-dependent directories` errors then run:
+This repo manages dotfiles and machine setup using [chezmoi](https://chezmoi.io). It has two tracks:
+
+- `home/` — the chezmoi-managed source tree for new machines (the active path).
+- `profiles/` — the legacy safety net keeping the current symlinked Mac working until cutover.
+- See [docs/directory-reference.md](docs/directory-reference.md) for a full breakdown of every directory and file in this repo.
+
+The practical migration notes are in [docs/chezmoi-migration.md](docs/chezmoi-migration.md).
+
+
+## Bootstrap
+
+For any new machine:
+
+1. Install Xcode Command Line Tools and wait for it to complete:
+
+```bash
+xcode-select --install
+```
+
+1. Clone this repo and run the bootstrap script with your profile (`personal`, `studio`, or `devbox`):
+
+```bash
+git clone https://github.com/jsfeb26/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./bootstrap.sh --profile personal   # or studio, devbox
+```
+
+The script will install Homebrew (if needed), install chezmoi, and apply all dotfiles.
+
+1. Open a new shell after it completes.
+2. If you get `Zsh detects insecure completion-dependent directories` errors:
 
 ```bash
 chmod 755 /usr/local/share/zsh
 chmod 755 /usr/local/share/zsh/site-functions
 ```
+
+## Day-to-day Workflow
+
+### Updating shell configs (aliases, functions, env vars, etc.)
+
+The fastest way is to open Claude Code in the dotfiles directory:
+
+```bash
+ccdotfiles
+```
+
+Then just describe what you want — "add an alias for X", "add a function that does Y", "export Z as an env var". The `update-configs` skill will route the change to the right file, run `chezmoi apply`, commit, and push automatically.
+
+The file routing:
+
+
+| What you want to change                 | File                                  |
+| --------------------------------------- | ------------------------------------- |
+| Shell aliases                           | `home/dot_config/shell/aliases.sh`    |
+| Shell functions                         | `home/dot_config/shell/functions.sh`  |
+| Environment variables / exports         | `home/dot_config/shell/env.sh`        |
+| PATH modifications                      | `home/dot_config/shell/path.sh`       |
+| Tool setup (nvm, starship, atuin, etc.) | `home/dot_config/shell/tooling.sh`    |
+| Zsh plugins / completion / keybindings  | `home/dot_config/zsh/interactive.zsh` |
+| Git config                              | `home/dot_gitconfig.tmpl`             |
+| Starship prompt                         | `home/dot_config/starship.toml`       |
+| Tmux config                             | `home/dot_tmux.conf`                  |
+
+
+Machine-specific things (personal paths, work tokens, SDK locations) belong in the unmanaged `.local` files (`~/.zshrc.local`, `~/.gitconfig.local`, etc.) and should not be committed here.
+
+### Adding or removing packages
+
+Edit `home/.chezmoidata/packages.yaml`. Packages are grouped by package manager and profile:
+
+- `brew.common` — installed on all Mac profiles
+- `brew.personal` / `brew.studio` — profile-specific brew formulae
+- `casks.personal` / `casks.studio` — GUI apps
+- `mas.personal` / `mas.studio` — Mac App Store apps (by ID)
+- `apt.common` / `apt.devbox` — Linux packages
+
+After editing, apply and sync:
+
+```bash
+chezmoi apply
+git add home/.chezmoidata/packages.yaml
+git commit -m "add <package-name>"
+git push
+```
+
+### Applying changes to the current machine
+
+```bash
+chezmoi apply
+```
+
+To preview what will change before applying:
+
+```bash
+chezmoi diff
+```
+
+### Pulling updates from another machine
+
+```bash
+cd ~/dotfiles && git pull && chezmoi apply
+```
+
+## Current Machine Note
+
+The current Mac can keep using the legacy `profiles/` files until you explicitly cut it over. New machines should ignore that path and use chezmoi-managed files from `home/`.
 
 ## Customize Settings
 
@@ -38,28 +131,28 @@ chmod 755 /usr/local/share/zsh/site-functions
 
 ### Mac Settings
 
-- Install Flipqlo Clock Screen Saver `~/dotfiles/installers/Fliqlo.dmg`
-- Install TrackballWorks `~/dotfiles/installers/TrackballWorks.dmg`
-  ![TrackballWorks Settings](settings/trackballworks.png)
+- Install Flipqlo Clock Screen Saver `~/.local/share/chezmoi/installers/Fliqlo.dmg`
+- Install TrackballWorks `~/.local/share/chezmoi/installers/TrackballWorks.dmg`
+TrackballWorks Settings
 - [Install Logitech Options](https://support.logi.com/hc/en-us/articles/360025297893)
   - Installer is located in Dropbox/Installers
   - Make bottom button open Mission Control
 - Keyboard Settings
-  ![Keyboard Settings](settings/keyboard.png)
-  ![Keyboard Modifier Keys Settings](settings/keyboard_modifier-keys.png)
-  ![Keyboard Shortcuts Settings](settings/keyboard_shortcuts.png)
+Keyboard Settings
+Keyboard Modifier Keys Settings
+Keyboard Shortcuts Settings
 - Mouse Settings
-  ![Mouse Settings](settings/mouse.png)
+Mouse Settings
 - Energy Saver
-  ![Energy Saver Settings](settings/energy-saver.png)
+Energy Saver Settings
 - Hot Corners
-  ![Hot Corners Settings](settings/hot-corners.png)
+Hot Corners Settings
 - Mission Control
-  ![Mission Control Settings](settings/mission-control.png)
+Mission Control Settings
 - General
-  ![General Settings](settings/general.png)
+General Settings
 - Dock
-  ![Dock Settings](settings/dock.png)
+Dock Settings
 - [Optional] set key repeat `defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false`
 
 ### Iris
@@ -69,13 +162,13 @@ chmod 755 /usr/local/share/zsh/site-functions
   - 1.1.5 Macbook Pro (Personal)
   - 1.2.0 Macbook Pro (Ambient)
 - Use installer for in specific iris version in `/installers/*`
-  ![Iris Settings](settings/iris-blue-light.png)
-  ![Iris Settings](settings/iris-brightness.png)
-  ![Iris Settings](settings/iris-location.png)
-  ![Iris Settings](settings/iris-sleep.png)
-  ![Iris Settings](settings/iris-fonts.png)
+Iris Settings
+Iris Settings
+Iris Settings
+Iris Settings
+Iris Settings
 - ~~Go to Advanced -> Hidden Features~~
-- ~~Type in `import` and choose `/Users/{username}/dotfiles/profiles/iris.iris_settings`~~
+- ~~Type in `import` and choose `~/.local/share/chezmoi/profiles/iris.iris_settings`~~
 
 ### VSCode
 
@@ -89,25 +182,7 @@ chmod 755 /usr/local/share/zsh/site-functions
 
 ### Github add SSH Key
 
-- Go to [Github keys settings](https://github.com/settings/keys)
-- Click "New SSH Key"
-- Run `ssh-keygen -t rsa -b 4096 -C "jsfeb26@gmail.com"`
-- Follow default prompts
-- Run `eval "$(ssh-agent -s)"`
-- Run `open ~/.ssh/config` to see if config file exists. It shouldn't
-- Run `touch ~/.ssh/config` and then `code ~/.ssh/config`
-- Paste in
-
-```config
-Host *
-  AddKeysToAgent yes
-  UseKeychain yes
-  IdentityFile ~/.ssh/id_rsa
-```
-
-- Run `ssh-add --apple-use-keychain ~/.ssh/id_rsa` to add your SSH private key to the ssh-agent and store your passphrase in the keychain
-- Get SSH Key by running `pbcopy < ~/.ssh/id_rsa.pub`
-- Paste in Github SSH Key field
+See [docs/ssh-setup.md](../docs/ssh-setup.md) for the full setup guide.
 
 ### Warp
 
@@ -141,12 +216,15 @@ Host *
 
 - Integrate with 1Password CLI
   - 1Password -> Settings -> Developer
+- Set the Script Commands directory to `~/.config/raycast/script-commands`
+- Raycast helper node scripts live in `~/.config/raycast/nodeScripts`
+- Fill in `~/.config/raycast/.env` if you want the ACS login helper to work
 
 ### Configure iStat Menu
 
 - Get License Key from 1Password
 - Add Memory, Sensors, and Battery/Power
-  ![iState Menu Settings](settings/istat-menu.png)
+iState Menu Settings
 
 ### Configure Bartender 5
 
@@ -157,16 +235,16 @@ Host *
   - Turn on `Show items in bar below menu bar (Bartender Bar)`
   - Change `Bartender menu bar icon` to `Bartender`
 - Go to Settings -> Menu Bar Items
-  ![Bartender Menu Bar Items Settings](settings/bartender-menu-bar-items.png)
+Bartender Menu Bar Items Settings
 
 ### Configure CleanShotX
 
 - Get License Key from 1Password
--
+- 
 
 ### Configure Hyperkey
 
-![Hyperkey Settings](settings/hyperkey.png)
+Hyperkey Settings
 
 ### Configure CleanMyMac
 
@@ -179,12 +257,13 @@ Host *
 ### iTerm2 Sync Settings
 
 - Preferences -> General -> Preferences
-- Check both checkboxes and set path to `/Users/{username}/dotfiles/profiles/iterm`
+- Check both checkboxes and set path to `~/.local/share/chezmoi/profiles/iterm`
 
 ### Home Inventory
 
 - Open `iCloud Drive/Home Inventory/My_Stuff.hi3`
 - Update Backup Settings
-  ![Home Inventory Settings](settings/home-inventory-settings.png)
-- Run by double clicking `~/dotfiles/installers/Send-to-Home-Inventory.workflow`
+Home Inventory Settings
+- Run by double clicking `~/.local/share/chezmoi/installers/Send-to-Home-Inventory.workflow`
 - Run `git co settings`
+
