@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$current_branch" == "HEAD" ]]; then
+  echo "Cannot switch from detached HEAD." >&2
+  exit 1
+fi
+
+previous_branch="$(git rev-parse --abbrev-ref @{-1} 2>/dev/null || true)"
+if [[ -z "$previous_branch" ]]; then
+  echo "No previous branch found in reflog." >&2
+  exit 1
+fi
+
+if [[ "$previous_branch" == "$current_branch" ]]; then
+  echo "Previous branch is the same as the current branch." >&2
+  exit 1
+fi
+
+echo "Switching from ${current_branch} to ${previous_branch}"
+git switch "$previous_branch"

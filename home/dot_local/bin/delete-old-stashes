@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+one_month_ago_epoch() {
+  if date -d '1 month ago' +%s >/dev/null 2>&1; then
+    date -d '1 month ago' +%s
+  else
+    date -v-1m +%s
+  fi
+}
+
+format_epoch() {
+  if date -d "@$1" >/dev/null 2>&1; then
+    date -d "@$1"
+  else
+    date -r "$1"
+  fi
+}
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "Not in a git repository." >&2
+  exit 1
+fi
+
+cutoff_timestamp="$(one_month_ago_epoch)"
+stashes_to_delete=()
+
+echo "Checking for stashes older than $(format_epoch "$cutoff_timestamp")"
+
+while IFS=' ' read -r stash_ref stash_timestamp stash_message; do
+  if [[ "$stash_timestamp" =~ ^[0-9]+$ ]] && [[ "$stash_timestamp" -lt "$cutoff_timestamp" ]]; then
+    echo "${stash_ref} ($(format_epoch "$stash_timestamp")): ${stash_message}"
+    stashes_to_delete+=("$stash_ref")
+  fi
+done < <(git stash list --format='%gd %ct %gs')
+
+if [[ ${#stashes_to_delete[@]} -eq 0 ]]; then
+  echo "No stashes older than one month found."
+  exit 0
+fi
+
+echo
+read -r -p "Delete these ${#stashes_to_delete[@]} stash(es)? (y/N): " confirm
+
+if [[ "$confirm" =~ ^[Yy]$ ]]; then
+  mapfile -t sorted_stashes < <(
+    printf '%s\n' "${stashes_to_delete[@]}" |
+      sed 's/stash@{//; s/}//' |
+      sort -nr |
+      sed 's/^/stash@{/; s/$/}/'
+  )
+
+  for stash_ref in "${sorted_stashes[@]}"; do
+    git stash drop "$stash_ref"
+  done
+fi

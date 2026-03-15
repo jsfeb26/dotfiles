@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$branch" == "HEAD" ]]; then
+  echo "Refusing to push from detached HEAD." >&2
+  exit 1
+fi
+
+base_branch="main"
+if ! git rev-parse --verify "origin/${base_branch}" >/dev/null 2>&1; then
+  if git rev-parse --verify origin/master >/dev/null 2>&1; then
+    base_branch="master"
+  fi
+fi
+
+if [[ "$branch" != "$base_branch" ]]; then
+  echo "Fetching latest from origin/${base_branch}..."
+  git fetch origin "$base_branch" --quiet 2>/dev/null || true
+
+  behind_count="$(git rev-list --count "${branch}..origin/${base_branch}" 2>/dev/null || echo 0)"
+  if [[ "$behind_count" -gt 0 ]]; then
+    printf 'Your branch is %s commit(s) behind origin/%s.\n' "$behind_count" "$base_branch"
+    read -r -p "Rebase on origin/${base_branch} before pushing? (y/N): " rebase_answer
+
+    if [[ "$rebase_answer" =~ ^[Yy] ]]; then
+      git rebase "origin/${base_branch}" || {
+        echo "Rebase failed. Resolve conflicts, then continue or abort manually." >&2
+        exit 1
+      }
+    fi
+  fi
+fi
+
+if git push origin "$branch"; then
+  exit 0
+fi
+
+read -r -p "Push failed. Force push with --force-with-lease? (y/N): " answer
+if [[ "$answer" =~ ^[Yy]$ ]]; then
+  git push --force-with-lease origin "$branch"
+fi

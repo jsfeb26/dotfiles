@@ -1,0 +1,110 @@
+brew:
+  common:
+    - atuin
+    - bat
+    - diff-so-fancy
+    - fd
+    - figlet
+    - fzf
+    - gh
+    - git
+    - jq
+    - neovim
+    - ripgrep
+    - starship
+    - tmux
+    - tree
+    - uv
+    - wget
+    - zsh
+    - zsh-autosuggestions
+    - zsh-syntax-highlighting
+  personal:
+    - 1password-cli
+    - docker
+    - gum
+    - mas
+    - python3
+    - tldr
+  studio:
+    - 1password-cli
+    - docker
+    - gum
+    - mas
+    - python3
+    - tldr
+casks:
+  personal:
+    - 1password
+    - arc
+    - bitwarden
+    - thebrowsercompany-dia
+    - bartender
+    - betterdisplay
+    - cleanshot
+    - cursor
+    - dropbox
+    - firefox
+    - ghostty
+    - google-chrome
+    - iterm2
+    - nordvpn
+    - notion
+    - notion-calendar
+    - notunes
+    - raycast
+    - slack
+    - spotify
+    - visual-studio-code
+  studio:
+    - arc
+    - bitwarden
+    - thebrowsercompany-dia
+    - bartender
+    - betterdisplay
+    - cleanshot
+    - cursor
+    - dropbox
+    - firefox
+    - ghostty
+    - google-chrome
+    - iterm2
+    - nordvpn
+    - notion
+    - notion-calendar
+    - notunes
+    - raycast
+    - slack
+    - spotify
+    - visual-studio-code
+mas:
+  personal:
+    - 413564952
+    - 904280696
+  studio:
+    - 413564952
+    - 904280696
+apt:
+  common:
+    - bat
+    - build-essential
+    - ca-certificates
+    - curl
+    - fd-find
+    - fzf
+    - git
+    - jq
+    - locales
+    - neovim
+    - ripgrep
+    - tmux
+    - tree
+    - unzip
+    - wget
+    - zsh
+    - zsh-autosuggestions
+    - zsh-syntax-highlighting
+  devbox:
+    - bash-completion
+    - python3
+    - python3-pip

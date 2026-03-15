@@ -1,0 +1,10 @@
+shell_source() {
+  [ -r "$1" ] && . "$1"
+}
+
+shell_source "$HOME/.config/shell/profile.sh"
+shell_source "$HOME/.config/shell/aliases.sh"
+shell_source "$HOME/.config/shell/functions.sh"
+shell_source "$HOME/.config/shell/tooling.sh"
+shell_source "$HOME/.config/zsh/interactive.zsh"
+shell_source "$HOME/.zshrc.local"

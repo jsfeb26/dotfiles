@@ -1,0 +1,142 @@
+let mapleader=","
+
+" Plug bundle manager {{{
+    call plug#begin('~/.vim/plugged')
+
+    Plug 'tpope/vim-git'
+    Plug 'moll/vim-node'
+    Plug 'pangloss/vim-javascript'
+
+    Plug 'othree/html5.vim', { 'for': ['htm'] }
+    Plug 'leshill/vim-json'
+    Plug 'mxw/vim-jsx'
+
+    Plug 'tpope/vim-surround'
+    Plug 'christoomey/vim-tmux-navigator'
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+    Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-eunuch'
+    Plug 'tpope/vim-repeat'
+    Plug 'editorconfig/editorconfig-vim'
+    Plug 'rking/ag.vim'
+    Plug 'scrooloose/nerdtree'
+    Plug 'jistr/vim-nerdtree-tabs'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+
+    Plug 'vim-scripts/Spacegray.vim'
+    Plug 'altercation/vim-colors-solarized'
+    Plug 'jackfranklin/Smyck-Color-Scheme'
+
+    call plug#end()
+"}}}
+
+" General {{{
+    set nocompatible
+" }}}
+
+" Colors {{{
+    syntax enable
+    set background=dark
+    colorscheme smyck
+" }}}
+
+" Spaces & Tabs {{{
+    set history=10000
+    set tabstop=4
+    set softtabstop=4
+    set expandtab
+    set autoindent
+    set modelines=1
+    filetype plugin indent on
+" }}}
+
+" UI Layout {{{
+    set number
+    set showcmd
+    filetype indent on
+    set wildmenu
+    set lazyredraw
+    set showmatch
+    set textwidth=100
+    set colorcolumn=120
+    set cursorline
+    hi cursorline cterm=none term=none
+    autocmd WinEnter * setlocal cursorline
+    autocmd WinLeave * setlocal nocursorline
+    set scrolloff=5
+    nnoremap <CR> :noh<CR><CR>
+    set synmaxcol=500
+" }}}
+
+" NerdTree {{{
+    autocmd VimEnter * NERDTree | wincmd p
+    map <Tab> :NERDTreeTabsToggle<CR>
+    let NERDTreeShowHidden=1
+" }}}
+
+" Searching {{{
+    set incsearch
+    set hlsearch
+    nnoremap <leader><space> :nohlsearch<CR>
+    imap <c-x><c-o> <plug>(fzf-complete-line)
+    nnoremap <leader>t :Files<cr>
+    nnoremap <leader>b :Buffers<cr>
+
+    nmap <leader><tab> <plug>(fzf-maps-n)
+    xmap <leader><tab> <plug>(fzf-maps-x)
+    omap <leader><tab> <plug>(fzf-maps-o)
+
+    let g:fzf_prefer_tmux = 1
+" }}}
+
+" Folding {{{
+    set foldenable
+    set foldlevelstart=10
+    set foldnestmax=10
+    nnoremap <space> za
+    set foldmethod=indent
+" }}}
+
+" Movement {{{
+    nnoremap j gj
+    nnoremap k gk
+    nnoremap B ^
+    nnoremap E $
+    nnoremap gV `[V`]
+" }}}
+
+" Leader Shortcuts {{{
+    nnoremap <leader>u :GundoToggle<CR>
+    nnoremap <leader>s :mksession<CR>
+    nnoremap <leader>f :Ack!<space>
+    let g:ctrlp_match_window='bottom,order:ttb'
+    let g:ctrlp_switch_buffer=0
+    let g:ctrlp_working_path_mode=0
+    let g:ctrlp_custom_ignore = '\vbuild/|node_modules/|dist/|venv/|target/|\.(o|swp|pyc|egg)$'
+    let g:ctrlp_map = '<c-p>'
+    let g:ctrlp_cmd = 'CtrlP'
+" }}}
+
+" Airline & Fugitive {{{
+    set laststatus=2
+    let g:airline_theme = 'zenburn'
+    let g:airline_left_sep = ''
+    let g:airline_left_sep = ''
+    let g:airline_right_sep = ''
+    let g:airline_right_sep = ''
+    set statusline=%F%m%r%h%w\
+    set statusline+=\ %y
+    set statusline+=\ %{fugitive#statusline()}
+" }}}
+
+" Backups {{{
+    set backup
+    set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+    set backupskip=/tmp/*,/private/tmp/*
+    set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+    set writebackup
+" }}}
+
+" vim:foldmethod=marker:foldlevel=0

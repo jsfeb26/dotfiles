@@ -1,0 +1,8 @@
+# Local git-only overrides.
+#
+# Examples:
+# [maintenance]
+#   repo = $HOME/dev/project
+#
+# [coderabbit]
+#   machineId = cli/replace-me

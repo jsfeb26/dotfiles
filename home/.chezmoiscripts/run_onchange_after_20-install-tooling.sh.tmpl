@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+install_if_missing() {
+  local command_name="$1"
+  local install_cmd="$2"
+
+  if command -v "$command_name" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  sh -c "$install_cmd"
+}
+
+install_nvm() {
+  if [[ -s "${HOME}/.nvm/nvm.sh" ]]; then
+    return 0
+  fi
+
+  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+}
+
+install_vim_plug() {
+  curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  curl -fLo "${XDG_DATA_HOME:-${HOME}/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+}
+
+install_nvm
+install_if_missing "starship" "curl -fsSL https://starship.rs/install.sh | sh -s -- -y"
+install_if_missing "atuin" "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
+install_if_missing "uv" "curl -LsSf https://astral.sh/uv/install.sh | sh"
+install_vim_plug
+
+if [[ -s "${HOME}/.nvm/nvm.sh" ]]; then
+  # shellcheck disable=SC1090
+  . "${HOME}/.nvm/nvm.sh"
+  nvm install --lts
+  nvm alias default 'lts/*'
+fi

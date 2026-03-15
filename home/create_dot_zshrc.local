@@ -1,0 +1,11 @@
+# Zsh-only local overrides.
+#
+# Machine-specific values that do not belong in shared dotfiles:
+# export OBSIDIAN_SECOND_BRAIN="$HOME/Dropbox/Obsidian Vaults/Agentic Second Brain"
+# export ANDROID_HOME="$HOME/Library/Android/sdk"
+# export JAVA_HOME="/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home"
+#
+# Optional remote tmux auto-attach pattern:
+# if [[ -n "$SSH_CONNECTION" ]] && command -v tmux >/dev/null 2>&1 && [[ -z "${TMUX:-}" ]]; then
+#   tmux new-session -A -s main
+# fi

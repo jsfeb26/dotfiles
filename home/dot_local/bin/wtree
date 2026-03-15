@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: wtree [-s|--setup] [-r|--run] [--pm npm|pnpm] branch1 [branch2 ...]
+EOF
+}
+
+setup=false
+run_app=false
+package_manager="pnpm"
+branches=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -s|--setup)
+      setup=true
+      shift
+      ;;
+    -r|--run)
+      run_app=true
+      setup=true
+      shift
+      ;;
+    --pm)
+      package_manager="${2:-}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      branches+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [[ ${#branches[@]} -eq 0 ]]; then
+  usage >&2
+  exit 1
+fi
+
+if [[ "$run_app" == true && ${#branches[@]} -gt 1 ]]; then
+  echo "--run supports only one branch." >&2
+  exit 1
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+repo_name="$(basename "$repo_root")"
+worktree_parent="$(dirname "$repo_root")"
+
+base_branch="main"
+if ! git rev-parse --verify "origin/${base_branch}" >/dev/null 2>&1; then
+  if git rev-parse --verify origin/master >/dev/null 2>&1; then
+    base_branch="master"
+  fi
+fi
+
+for branch in "${branches[@]}"; do
+  target_path="${worktree_parent}/${repo_name}-${branch}"
+
+  if git worktree list | grep -q "^${target_path}[[:space:]]"; then
+    echo "Worktree already exists at ${target_path}. Skipping ${branch}."
+    continue
+  fi
+
+  if ! git show-ref --verify --quiet "refs/heads/${branch}"; then
+    echo "Creating ${branch} from origin/${base_branch}..."
+    git fetch origin "$base_branch" --quiet
+    git branch "$branch" "origin/${base_branch}"
+  fi
+
+  git worktree add "$target_path" "$branch"
+
+  if command -v cursor >/dev/null 2>&1; then
+    cursor "$target_path"
+  else
+    echo "Created worktree: $target_path"
+  fi
+
+  if [[ "$setup" == true ]]; then
+    if [[ -f "${repo_root}/.env" ]]; then
+      cp "${repo_root}/.env" "${target_path}/.env"
+    fi
+
+    if ! command -v "$package_manager" >/dev/null 2>&1; then
+      echo "Package manager not found: ${package_manager}" >&2
+      exit 1
+    fi
+
+    (
+      cd "$target_path"
+      "$package_manager" install
+      if [[ "$run_app" == true ]]; then
+        "$package_manager" start -- --port 3001
+      fi
+    )
+  fi
+done

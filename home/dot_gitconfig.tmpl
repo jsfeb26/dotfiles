@@ -1,0 +1,54 @@
+[rerere]
+  enabled = true
+[alias]
+  co = checkout
+  br = branch
+  s = status
+  last = log -1 HEAD
+  r = rebase -i
+  cm = commit -m
+  cp = cherry-pick
+  open = browse -- .
+  cob = "!f() { git checkout -b \"$1\" origin/main; }; f"
+  pb = !~/.local/bin/push-branch
+  z = !~/.local/bin/switch-previous-branch
+  wb = !~/.local/bin/find-commit-branch
+[user]
+  email = {{ .git_email }}
+  name = {{ .git_name }}
+[github]
+  user = {{ .github_user }}
+{{- if eq .chezmoi.os "darwin" }}
+[credential]
+  helper = osxkeychain
+{{- end }}
+[core]
+  editor = vim
+  excludesfile = ~/.config/git/ignore
+{{- if eq .chezmoi.os "darwin" }}
+  pager = diff-so-fancy | less --tabs=4 -RFX
+{{- end }}
+[color]
+  ui = true
+[color "diff-highlight"]
+  oldNormal = red bold
+  oldHighlight = red bold 52
+  newNormal = green bold
+  newHighlight = green bold 22
+[color "diff"]
+  meta = 11
+  frag = magenta bold
+  commit = yellow bold
+  old = red bold
+  new = green bold
+  whitespace = red reverse
+[init]
+  defaultBranch = main
+[url "git@github.com:"]
+  insteadOf = https://github.com/
+[commit]
+  template = ~/.config/git/commit-template
+[format]
+  pretty = format:%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(bold red)%an%C(reset)%C(bold yellow)%d%C(reset) %C(white)- %s%C(reset)
+[include]
+  path = ~/.gitconfig.local

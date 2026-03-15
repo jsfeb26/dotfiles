@@ -1,0 +1,16 @@
+IgnoreUnknown UseKeychain
+Include ~/.ssh/config.local
+
+{{- if eq .profile "personal" }}
+Host stackmod_albert
+  HostName 172.28.48.161
+  User ubuntu
+  IdentityFile ~/.ssh/stackmod_albert.pem
+
+{{- end }}
+Host *
+  AddKeysToAgent yes
+{{- if eq .chezmoi.os "darwin" }}
+  UseKeychain yes
+{{- end }}
+  IdentityFile ~/.ssh/id_ed25519

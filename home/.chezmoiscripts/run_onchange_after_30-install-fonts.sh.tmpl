@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+{{- if and (eq .chezmoi.os "darwin") (or (eq .profile "personal") (eq .profile "studio")) }}
+repo_root="$(cd "{{ .chezmoi.sourceDir }}/.." && pwd)"
+font_source="${repo_root}/fonts"
+
+if [[ -d "${font_source}" ]]; then
+  mkdir -p "${HOME}/Library/Fonts"
+  cp -R "${font_source}/." "${HOME}/Library/Fonts/"
+fi
+{{- else }}
+exit 0
+{{- end }}

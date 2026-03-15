@@ -1,0 +1,5 @@
+[data]
+    git_name = "Jason Stinson"
+    git_email = "jsfeb26@gmail.com"
+    github_user = "jsfeb26"
+    profile = {{ if ne (env "CHEZMOI_PROFILE") "" }}{{ env "CHEZMOI_PROFILE" | quote }}{{ else if eq .chezmoi.os "darwin" }}"personal"{{ else }}"devbox"{{ end }}

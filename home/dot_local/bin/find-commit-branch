@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: find-commit-branch <commit-hash>" >&2
+  exit 1
+fi
+
+commit="$1"
+full_hash="$(git rev-parse --verify "$commit" 2>/dev/null || true)"
+branches=""
+
+if [[ -n "$full_hash" ]]; then
+  branches="$(git branch -r --contains "$full_hash" 2>/dev/null || true)"
+fi
+
+if [[ -z "$full_hash" || -z "$branches" ]]; then
+  echo "Fetching latest refs..."
+  remotes="$(git remote)"
+  remote_count="$(printf '%s\n' "$remotes" | sed '/^$/d' | wc -l | tr -d ' ')"
+
+  if [[ "$remote_count" -eq 1 ]]; then
+    git fetch "$remotes" --prune --quiet
+  else
+    git fetch --all --prune --quiet
+  fi
+
+  if [[ -z "$full_hash" ]]; then
+    full_hash="$(git rev-parse --verify "$commit" 2>/dev/null || true)"
+    [[ -n "$full_hash" ]] || {
+      echo "Commit not found: $commit" >&2
+      exit 1
+    }
+  fi
+
+  branches="$(git branch -r --contains "$full_hash" 2>/dev/null || true)"
+fi
+
+if [[ -z "$branches" ]]; then
+  echo "No remote branches contain ${commit} (${full_hash})."
+  exit 0
+fi
+
+echo "Commit: ${full_hash}"
+echo "Branches:"
+echo
+printf '%s\n' "$branches"

@@ -1,0 +1,3 @@
+# Local login-shell overrides.
+# Example:
+# export WORKON_HOME="$HOME/.virtualenvs"

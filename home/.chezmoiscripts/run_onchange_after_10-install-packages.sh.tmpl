@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+profile="{{ .profile }}"
+os="{{ .chezmoi.os }}"
+
+brew_common=(
+{{- range .brew.common }}
+  "{{ . }}"
+{{- end }}
+)
+brew_profile=(
+{{- if eq .profile "personal" }}
+{{- range .brew.personal }}
+  "{{ . }}"
+{{- end }}
+{{- else if eq .profile "studio" }}
+{{- range .brew.studio }}
+  "{{ . }}"
+{{- end }}
+{{- end }}
+)
+casks=(
+{{- if eq .profile "personal" }}
+{{- range .casks.personal }}
+  "{{ . }}"
+{{- end }}
+{{- else if eq .profile "studio" }}
+{{- range .casks.studio }}
+  "{{ . }}"
+{{- end }}
+{{- end }}
+)
+mas_apps=(
+{{- if eq .profile "personal" }}
+{{- range .mas.personal }}
+  "{{ . }}"
+{{- end }}
+{{- else if eq .profile "studio" }}
+{{- range .mas.studio }}
+  "{{ . }}"
+{{- end }}
+{{- end }}
+)
+apt_common=(
+{{- range .apt.common }}
+  "{{ . }}"
+{{- end }}
+)
+apt_profile=(
+{{- if eq .profile "devbox" }}
+{{- range .apt.devbox }}
+  "{{ . }}"
+{{- end }}
+{{- end }}
+)
+
+run_apt() {
+  if ! command -v apt-get >/dev/null 2>&1; then
+    echo "Skipping apt bootstrap because apt-get is unavailable."
+    return 0
+  fi
+
+  local -a packages=("${apt_common[@]}")
+  if [[ ${#apt_profile[@]} -gt 0 ]]; then
+    packages+=("${apt_profile[@]}")
+  fi
+
+  if command -v sudo >/dev/null 2>&1; then
+    sudo apt-get update
+    sudo apt-get install -y "${packages[@]}"
+  else
+    apt-get update
+    apt-get install -y "${packages[@]}"
+  fi
+}
+
+run_brew() {
+  if ! command -v brew >/dev/null 2>&1; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+
+  eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
+
+  brew update
+  brew install "${brew_common[@]}"
+
+  if [[ ${#brew_profile[@]} -gt 0 ]]; then
+    brew install "${brew_profile[@]}"
+  fi
+
+  if [[ ${#casks[@]} -gt 0 ]]; then
+    brew install --cask "${casks[@]}"
+  fi
+
+  if command -v mas >/dev/null 2>&1 && [[ ${#mas_apps[@]} -gt 0 ]]; then
+    if mas account >/dev/null 2>&1; then
+      mas install "${mas_apps[@]}"
+    else
+      echo "Skipping Mac App Store installs because mas is not signed in."
+    fi
+  fi
+}
+
+mkdir -p "${HOME}/dev"
+
+case "$os" in
+  darwin)
+    run_brew
+    ;;
+  linux)
+    run_apt
+    ;;
+  *)
+    echo "Skipping package bootstrap for unsupported OS: ${os}"
+    ;;
+esac
