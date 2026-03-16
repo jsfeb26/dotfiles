@@ -126,13 +126,8 @@ main() {
 
   export CHEZMOI_PROFILE="$profile"
 
-  source_path="$(chezmoi source-path 2>/dev/null || true)"
-
-  if [[ -n "$source_path" && -d "$source_path/.git" ]]; then
-    chezmoi apply
-  else
-    chezmoi init --apply "$repo_root"
-  fi
+  # Always use init --apply so the config template is (re)processed
+  chezmoi init --apply "$repo_root"
 
   echo ""
   echo "Bootstrap complete! Start a new shell session to pick up all changes:"
