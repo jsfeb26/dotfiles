@@ -19,18 +19,30 @@ For any new machine:
 xcode-select --install
 ```
 
-1. Clone this repo and run the bootstrap script with your profile (`personal`, `studio`, or `devbox`):
+2. Set up GitHub SSH keys (see [docs/ssh-setup.md](docs/ssh-setup.md) for full guide):
 
 ```bash
-git clone https://github.com/jsfeb26/dotfiles.git ~/dotfiles
+ssh-keygen -t ed25519 -C "your-github-email@example.com"
+eval "$(ssh-agent -s)"
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+pbcopy < ~/.ssh/id_ed25519.pub
+# Add the key at https://github.com/settings/keys
+ssh -T git@github.com  # verify it works
+```
+
+3. Clone this repo and run the bootstrap script with your profile (`personal`, `studio`, or `devbox`):
+
+```bash
+git clone git@github.com:jsfeb26/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./bootstrap.sh --profile personal   # or studio, devbox
 ```
 
-The script will install Homebrew (if needed), install chezmoi, and apply all dotfiles.
+The script will install Homebrew (if needed), install chezmoi, and apply all dotfiles. It checks for Xcode tools and GitHub SSH access before proceeding.
 
-1. Open a new shell after it completes.
-2. If you get `Zsh detects insecure completion-dependent directories` errors:
+4. Open a new shell after it completes (`exec zsh -l`).
+
+5. If you get `Zsh detects insecure completion-dependent directories` errors:
 
 ```bash
 chmod 755 /usr/local/share/zsh

@@ -27,6 +27,22 @@ check_xcode_tools() {
   exit 1
 }
 
+check_ssh_github() {
+  if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    return 0
+  fi
+
+  echo "GitHub SSH access is required but not configured." >&2
+  echo "Set up SSH keys before running bootstrap. See docs/ssh-setup.md or:" >&2
+  echo "" >&2
+  echo "  1. ssh-keygen -t ed25519 -C \"your-github-email@example.com\"" >&2
+  echo "  2. eval \"\$(ssh-agent -s)\"" >&2
+  echo "  3. ssh-add --apple-use-keychain ~/.ssh/id_ed25519" >&2
+  echo "  4. Add the public key to https://github.com/settings/keys" >&2
+  echo "  5. Verify: ssh -T git@github.com" >&2
+  exit 1
+}
+
 ensure_homebrew_in_path() {
   if command -v brew >/dev/null 2>&1; then
     return 0
@@ -46,6 +62,7 @@ ensure_dependencies() {
   case "$os" in
     Darwin)
       check_xcode_tools
+      check_ssh_github
 
       # Install Homebrew if missing
       if ! command -v brew >/dev/null 2>&1; then
