@@ -144,6 +144,12 @@ main() {
     profile = "${profile}"
 TOML
 
+  # Remove stale chezmoi source so init always copies the current repo
+  local chezmoi_source="${HOME}/.local/share/chezmoi"
+  if [[ -d "$chezmoi_source" ]]; then
+    rm -rf "$chezmoi_source"
+  fi
+
   chezmoi init --apply "$repo_root"
 
   echo ""
