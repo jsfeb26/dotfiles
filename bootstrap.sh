@@ -27,7 +27,19 @@ check_xcode_tools() {
   exit 1
 }
 
-install_chezmoi() {
+ensure_homebrew_in_path() {
+  if command -v brew >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv bash)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv bash)"
+  fi
+}
+
+ensure_dependencies() {
   local os
   os="$(uname -s)"
 
@@ -35,23 +47,26 @@ install_chezmoi() {
     Darwin)
       check_xcode_tools
 
-      # Ensure Homebrew is in PATH (needed on fresh installs or new shells)
+      # Install Homebrew if missing
       if ! command -v brew >/dev/null 2>&1; then
-        if [[ -x /opt/homebrew/bin/brew ]]; then
-          eval "$(/opt/homebrew/bin/brew shellenv bash)"
-        elif [[ -x /usr/local/bin/brew ]]; then
-          eval "$(/usr/local/bin/brew shellenv bash)"
-        else
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          eval "$(/opt/homebrew/bin/brew shellenv bash 2>/dev/null || /usr/local/bin/brew shellenv bash 2>/dev/null)"
-        fi
+        ensure_homebrew_in_path
+      fi
+      if ! command -v brew >/dev/null 2>&1; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        ensure_homebrew_in_path
       fi
 
-      brew install chezmoi
+      # Install chezmoi if missing
+      if ! command -v chezmoi >/dev/null 2>&1; then
+        brew install chezmoi
+      fi
       ;;
     Linux)
-      local apt_installed=false
+      if command -v chezmoi >/dev/null 2>&1; then
+        return 0
+      fi
 
+      local apt_installed=false
       if command -v apt-get >/dev/null 2>&1; then
         if command -v sudo >/dev/null 2>&1; then
           sudo apt-get update
@@ -81,7 +96,6 @@ install_chezmoi() {
 main() {
   local profile=""
   local repo_root
-  local source_path=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -120,13 +134,16 @@ main() {
 
   repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-  if ! command -v chezmoi >/dev/null 2>&1; then
-    install_chezmoi
-  fi
+  ensure_dependencies
 
-  export CHEZMOI_PROFILE="$profile"
+  # Write chezmoi config with the selected profile
+  local chezmoi_config_dir="${HOME}/.config/chezmoi"
+  mkdir -p "$chezmoi_config_dir"
+  cat > "${chezmoi_config_dir}/chezmoi.toml" <<TOML
+[data]
+    profile = "${profile}"
+TOML
 
-  # Always use init --apply so the config template is (re)processed
   chezmoi init --apply "$repo_root"
 
   echo ""
