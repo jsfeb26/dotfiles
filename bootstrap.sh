@@ -28,7 +28,9 @@ check_xcode_tools() {
 }
 
 check_ssh_github() {
-  if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+  local ssh_output
+  ssh_output="$(ssh -T git@github.com 2>&1 || true)"
+  if [[ "$ssh_output" == *"successfully authenticated"* ]]; then
     return 0
   fi
 
@@ -38,7 +40,8 @@ check_ssh_github() {
       eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
     fi
     ssh-add --apple-use-keychain "${HOME}/.ssh/id_ed25519" 2>/dev/null || true
-    if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    ssh_output="$(ssh -T git@github.com 2>&1 || true)"
+    if [[ "$ssh_output" == *"successfully authenticated"* ]]; then
       return 0
     fi
   fi
