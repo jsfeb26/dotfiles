@@ -83,7 +83,7 @@ run_brew() {
 
   eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
 
-  brew update
+  brew update || echo "Warning: brew update failed (continuing anyway)"
   brew install "${brew_common[@]}"
 
   if [[ ${#brew_profile[@]} -gt 0 ]]; then
@@ -91,7 +91,9 @@ run_brew() {
   fi
 
   if [[ ${#casks[@]} -gt 0 ]]; then
-    brew install --cask "${casks[@]}"
+    for cask in "${casks[@]}"; do
+      brew install --cask "$cask" 2>/dev/null || true
+    done
   fi
 
   if command -v mas >/dev/null 2>&1 && [[ ${#mas_apps[@]} -gt 0 ]]; then
