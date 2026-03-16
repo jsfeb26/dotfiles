@@ -35,8 +35,16 @@ install_chezmoi() {
     Darwin)
       check_xcode_tools
 
+      # Ensure Homebrew is in PATH (needed on fresh installs or new shells)
       if ! command -v brew >/dev/null 2>&1; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        if [[ -x /opt/homebrew/bin/brew ]]; then
+          eval "$(/opt/homebrew/bin/brew shellenv bash)"
+        elif [[ -x /usr/local/bin/brew ]]; then
+          eval "$(/usr/local/bin/brew shellenv bash)"
+        else
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          eval "$(/opt/homebrew/bin/brew shellenv bash 2>/dev/null || /usr/local/bin/brew shellenv bash 2>/dev/null)"
+        fi
       fi
 
       brew install chezmoi
@@ -125,6 +133,11 @@ main() {
   else
     chezmoi init --apply "$repo_root"
   fi
+
+  echo ""
+  echo "Bootstrap complete! Start a new shell session to pick up all changes:"
+  echo ""
+  echo "  exec zsh -l"
 }
 
 main "$@"

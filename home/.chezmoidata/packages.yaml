@@ -36,7 +36,6 @@ brew:
 casks:
   personal:
     - 1password
-    - arc
     - bitwarden
     - thebrowsercompany-dia
     - bartender
@@ -57,7 +56,6 @@ casks:
     - spotify
     - visual-studio-code
   studio:
-    - arc
     - bitwarden
     - thebrowsercompany-dia
     - bartender
