@@ -28,6 +28,12 @@ check_xcode_tools() {
 }
 
 check_ssh_github() {
+  # Try to load SSH key from keychain (ssh config may not be in place yet)
+  if [[ -f "${HOME}/.ssh/id_ed25519" ]]; then
+    eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
+    ssh-add --apple-use-keychain "${HOME}/.ssh/id_ed25519" 2>/dev/null || true
+  fi
+
   if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
     return 0
   fi
