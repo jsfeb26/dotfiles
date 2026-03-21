@@ -1,0 +1,36 @@
+# ---- Keymaps ----
+keybind = ctrl+|=new_split:right
+keybind = cmd+shift+r=prompt_surface_title
+# ---- Themes ----
+# theme = catppuccin-frappe
+# theme = SpaceGray
+# theme = Spacedust
+# theme = SeaShells
+# theme = Oceanic-Next
+# theme = nord
+# theme = nightfox
+theme = Galaxy
+# theme = Chester
+# theme = ayu
+# theme = Andromeda
+
+# font-family = "Google Sans Code"
+# font-family = "Dank Mono"
+font-family = "FiraCode Nerd Font Mono"
+
+
+# --- Keybinding for Claude Code Newlines ---
+# No \ which works in zsh because of zsh's line editor
+# keybind = shift+enter=text:\x1b\r
+
+# Adds a \ to work universally
+keybind = shift+enter=text:\\\n
+
+# Treat left Option as Alt/Meta key (sends ESC prefix instead of Unicode)
+# Fixes Super Whisper Option+Space leaking a "C" into Claude Code
+macos-option-as-alt = left
+
+# Ghostty should open with all the same tabs and stuff
+window-save-state = always
+shell-integration = detect
+
