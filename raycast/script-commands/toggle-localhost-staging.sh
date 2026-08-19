@@ -30,10 +30,14 @@ return currentURL
 EOF
 )
 
-# Check if URL is localhost:3000 and convert to product.eng.ambient.ai
+# Check if URL is localhost:3000 or localhost:3001 and convert to product.eng.ambient.ai
 if [[ "$chrome_url" =~ ^http://localhost:3000(/.*)?$ ]]; then
   path="${chrome_url#http://localhost:3000}"
-  # Default to staging, but you could add logic to remember last remote if you want
+  new_url="https://product.eng.ambient.ai$path"
+  echo "Opening staging: $new_url"
+
+elif [[ "$chrome_url" =~ ^http://localhost:3001(/.*)?$ ]]; then
+  path="${chrome_url#http://localhost:3001}"
   new_url="https://product.eng.ambient.ai$path"
   echo "Opening staging: $new_url"
 
@@ -50,7 +54,7 @@ elif [[ "$chrome_url" =~ ^https://product\.eng\.ambient\.ai(/.*)?$ ]]; then
   echo "Opening localhost: $new_url"
 
 else
-  echo "Not on localhost:3000, product-staging.ambient.ai, or product.eng.ambient.ai — skipping."
+  echo "Not on localhost:3000, localhost:3001, product-staging.ambient.ai, or product.eng.ambient.ai — skipping."
   exit 0
 fi
 

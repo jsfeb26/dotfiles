@@ -7,48 +7,27 @@
 
 # Optional parameters:
 # @raycast.icon 🤖
-# @raycast.argument1 { "type": "text", "placeholder": "Environment (beta, app, staging, localhost)" }
+# @raycast.argument1 { "type": "text", "placeholder": "Environment (app, beta, main, prerelease, internal, product-beta, localhost)" }
 
 # Documentation:
-# @raycast.description Switch between Ambient environments (beta, app, staging, localhost, etc.)
+# @raycast.description Switch between Ambient environments (app, beta, main, prerelease, internal, product-beta, localhost) keeping the same path.
 # @raycast.author jsfeb26
 # @raycast.authorURL https://raycast.com/jsfeb26
 
-# Array of known Ambient environments to detect
-ambient_domains=(
-    "app.ambient.ai"
-    "beta.ambient.ai"
-    "main.ambient.ai"
-    "prerelease.ambient.ai"
-    "product.prod.ambient.ai"
-    "product-beta.ambient.ai"
-)
-
 target_env="$1"
 
-# Check if target environment is valid
+# Map the requested environment to its base URL
 case "$target_env" in
-    "app")
-        base_url="https://app.ambient.ai"
-        ;;
-    "beta")
-        base_url="https://beta.ambient.ai"
-        ;;
-    "main")
-        base_url="https://main.ambient.ai"
-        ;;
-    "prerelease")
-        base_url="https://prerelease.ambient.ai"
-        ;;
-    "internal")
-        base_url="https://product.prod.ambient.ai"
-        ;;
-    "product-beta")
-        base_url="https://product-beta.ambient.ai"
-        ;;
+    "app")               base_url="https://app.ambient.ai" ;;
+    "beta")              base_url="https://beta.ambient.ai" ;;
+    "main")              base_url="https://main.ambient.ai" ;;
+    "prerelease")        base_url="https://prerelease.ambient.ai" ;;
+    "internal")          base_url="https://product.prod.ambient.ai" ;;
+    "product-beta")      base_url="https://product-beta.ambient.ai" ;;
+    "localhost"|"local") base_url="http://localhost:3000" ;;
     *)
         echo "Invalid environment: $target_env"
-        echo "Valid environments: app, beta, prerelease, internal, product-beta, main"
+        echo "Valid environments: app, beta, main, prerelease, internal, product-beta, localhost"
         exit 1
         ;;
 esac
@@ -69,30 +48,22 @@ return currentURL
 EOF
 )
 
-# Check if current URL is from a known Ambient environment
-path=""
-is_ambient_env=false
-
-for domain in "${ambient_domains[@]}"; do
-    if [[ "$chrome_url" =~ ^https?://${domain//./\.}(/.*)?$ ]]; then
-        # Extract path from current URL
-        path="${chrome_url#https://$domain}"
-        is_ambient_env=true
-        break
-    fi
-done
-
-if [ "$is_ambient_env" = false ]; then
-    echo "Current tab is not on a known Ambient environment."
-    echo "Known environments: ${ambient_domains[@]}"
+# Extract the path from the current URL, keeping it intact.
+# Matches ANY *.ambient.ai subdomain (app, beta, product.prod, product-staging,
+# product.eng, etc.) so switching works from any environment, plus localhost.
+if [[ "$chrome_url" =~ ^https?://[^/]*\.ambient\.ai(/.*)?$ ]]; then
+    path="${BASH_REMATCH[1]}"
+elif [[ "$chrome_url" =~ ^https?://localhost(:[0-9]+)?(/.*)?$ ]]; then
+    path="${BASH_REMATCH[2]}"
+else
+    echo "Not an Ambient/localhost URL: $chrome_url"
     exit 0
 fi
 
-# Construct new URL
+# Construct the new URL and open it in a new tab
 new_url="$base_url$path"
 echo "Switching to $target_env: $new_url"
 
-# Open in new Chrome tab
 osascript <<EOF
 tell application "Google Chrome"
     tell front window
@@ -100,4 +71,3 @@ tell application "Google Chrome"
     end tell
 end tell
 EOF
-

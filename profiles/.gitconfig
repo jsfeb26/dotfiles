@@ -23,6 +23,10 @@
 	rwt = "!git worktree list | awk \"{print \\$1}\" | grep \"\\.cursor/worktrees\" | xargs -I{} git worktree remove --force {} ; git worktree list"
   # Which Branch - Find which remote branch(es) contain a commit
   wb = !~/dotfiles/scripts/find_commit_branch.sh
+  # Archive untracked files to ~/dev/git-archives/<repo>-<date>/
+  discard = !~/dotfiles/scripts/git-archive-untracked
+  # Discard all changes — restore tracked files and archive untracked
+  nuke = !git restore . && git discard
 
 [user]
   email = jsfeb26@gmail.com
@@ -66,3 +70,9 @@
 	repo = /Users/jasonstinson/dev/ambient/product
 [coderabbit]
 	machineId = cli/6cec4b5b795149f381dd502ca6bfad7d
+[pull]
+	ff = only
+[push]
+	autoSetupRemote = true
+[branch]
+	autoSetupMerge = simple

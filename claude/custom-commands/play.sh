@@ -35,6 +35,15 @@ OPENAI_MODEL="${OPENAI_MODEL:-gpt-4o-mini}"
 ELEVENLABS_API_KEY="${ELEVENLABS_API_KEY:-}"
 ELEVENLABS_VOICE_ID="${ELEVENLABS_VOICE_ID:-}"
 
+# Notify mode: "beep" (default) plays a short system sound; "speak" uses ChatGPT+ElevenLabs TTS.
+# Set CLAUDE_NOTIFY_MODE=speak in your .labs file to enable the full spoken summary.
+CLAUDE_NOTIFY_MODE="${CLAUDE_NOTIFY_MODE:-beep}"
+
+# Check silent mode flag
+if [[ -f "$HOME/.claude/.silent" ]]; then
+  exit 0
+fi
+
 # Read hook data from stdin
 HOOK_DATA=""
 
@@ -60,6 +69,20 @@ fi
 if [[ -z "$PROMPT" ]]; then
   PROMPT=$(echo "$HOOK_DATA" | jq -r '.prompt // empty')
 fi
+
+# --- Beep mode (default) ---
+if [[ "$CLAUDE_NOTIFY_MODE" != "speak" ]]; then
+  # Play a short system sound to signal completion
+  if command -v afplay >/dev/null 2>&1; then
+    afplay /System/Library/Sounds/Ping.aiff
+  else
+    echo -e "\a"
+  fi
+  exit 0
+fi
+
+# --- Speak mode (CLAUDE_NOTIFY_MODE=speak) ---
+# Calls ChatGPT to summarize the prompt, then speaks the result via ElevenLabs TTS.
 
 # Check if required commands are available
 for cmd in curl jq; do
@@ -92,10 +115,10 @@ if [[ -n "$OPENAI_KEY" && -n "$PROMPT" ]]; then
       ],
       temperature: 0.3
     }')
-    
+
   echo "Debug: Making OpenAI request with model: $OPENAI_MODEL"
   echo "Debug: Request body: $OPENAI_BODY"
-  
+
   OPENAI_RESP=$(curl -sS -f -X POST "https://api.openai.com/v1/chat/completions" \
     -H "Authorization: Bearer ${OPENAI_KEY}" \
     -H "Content-Type: application/json" \
@@ -128,15 +151,15 @@ fi
 # Play the message via ElevenLabs TTS if credentials are available
 if [[ -n "$ELEVENLABS_API_KEY" && -n "$ELEVENLABS_VOICE_ID" ]]; then
   echo "Playing message via ElevenLabs TTS..."
-  
+
   TMP_MP3="$(mktemp -t play.XXXXXX).mp3"
-  
+
   # Prepare JSON using jq to safely handle arbitrary message text
   MESSAGE_TEXT="Claude Finished"
   if [[ -n "$SIMPLE_MESSAGE" ]]; then
     MESSAGE_TEXT="An agent finished their work on $SIMPLE_MESSAGE"
   fi
-  
+
   JSON_BODY=$(jq -n --arg text "$MESSAGE_TEXT" '{
     text: $text,
     model_id: "eleven_multilingual_v2",
@@ -147,13 +170,13 @@ if [[ -n "$ELEVENLABS_API_KEY" && -n "$ELEVENLABS_VOICE_ID" ]]; then
       use_speaker_boost: true
     }
   }')
-  
+
   if curl -sS -f -X POST "https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128" \
     -H "xi-api-key: ${ELEVENLABS_API_KEY}" \
     -H "Content-Type: application/json" \
     -d "$JSON_BODY" \
     -o "$TMP_MP3"; then
-    
+
     # Function to play audio with fallbacks
     play_audio() {
       local file="$1"
@@ -169,7 +192,7 @@ if [[ -n "$ELEVENLABS_API_KEY" && -n "$ELEVENLABS_VOICE_ID" ]]; then
         return 1
       fi
     }
-    
+
     echo "Playing audio..."
     if ! play_audio "$TMP_MP3"; then
       echo "Warning: No suitable audio player found. Falling back to system TTS if available." >&2
@@ -183,7 +206,7 @@ if [[ -n "$ELEVENLABS_API_KEY" && -n "$ELEVENLABS_VOICE_ID" ]]; then
         echo "Error: Could not play audio. Please install 'ffplay' (ffmpeg), 'mpg123', or 'mpv'." >&2
       fi
     fi
-    
+
     rm -f "$TMP_MP3"
   else
     echo "Error: ElevenLabs API request failed. Please check your API key, voice ID, and network connection." >&2

@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "Not in a git repository" >&2
+  exit 1
+}
+
+REPO_NAME=$(basename "$REPO_ROOT")
+DATE=$(date +%Y-%m-%d)
+ARCHIVE_DIR="$HOME/dev/git-archives/$REPO_NAME-$DATE"
+
+mkdir -p "$ARCHIVE_DIR"
+
+count=0
+while IFS= read -r -d '' item; do
+  item="${item%/}"  # strip trailing slash from directories
+  dest="$ARCHIVE_DIR/$item"
+  mkdir -p "$(dirname "$dest")"
+  mv "$REPO_ROOT/$item" "$dest"
+  ((count++)) || true
+done < <(git -C "$REPO_ROOT" ls-files --others --exclude-standard --directory -z)
+
+if [[ $count -eq 0 ]]; then
+  echo "No untracked files to archive."
+  rmdir "$ARCHIVE_DIR" 2>/dev/null || true
+else
+  echo "Archived $count item(s) to $ARCHIVE_DIR"
+fi

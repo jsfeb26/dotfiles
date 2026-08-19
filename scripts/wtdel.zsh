@@ -5,6 +5,17 @@
 # If no argument is provided, deletes the current worktree you're in (with confirmation).
 # Uses gum for interactive prompts.
 # Automatically CDs back to the main repo after deletion.
+#
+# Branch names containing slashes are supported: wtree flattens them to dashes
+# in the directory name, so the branch cannot be recovered from the path.
+# The checked-out branch is read from git instead.
+
+# _wt_branch_at: print the branch checked out in the worktree at $1.
+# Prints nothing when the worktree is in a detached HEAD state.
+_wt_branch_at() {
+  git -C "$1" symbolic-ref --quiet --short HEAD 2>/dev/null
+}
+
 wtdel() {
   local delete_all=false
   local branch=""
@@ -84,14 +95,15 @@ wtdel() {
     while IFS= read -r wt_name; do
       [[ -z "$wt_name" ]] && continue
       local wt_path="$worktree_parent/$wt_name"
-      local wt_branch=${wt_name#${repo_name}-}
+      # Read the branch from git; the path can't be reversed once slashes are flattened
+      local wt_branch=$(_wt_branch_at "$wt_path")
 
       echo "Removing worktree: ${wt_name}..."
       git worktree remove "$wt_path" --force
 
       # Delete the branch if requested (but not main/master)
       if [[ "$delete_branches" == "Delete worktrees + branches" ]]; then
-        if [[ "$wt_branch" != "main" && "$wt_branch" != "master" ]]; then
+        if [[ -n "$wt_branch" && "$wt_branch" != "main" && "$wt_branch" != "master" ]]; then
           git branch -D "$wt_branch" 2>/dev/null && echo "Deleted branch: ${wt_branch}"
         fi
       fi
@@ -102,38 +114,43 @@ wtdel() {
   fi
 
   # Delete specific or current worktree
-  local current_path=$(pwd)
   local target_path=""
   local target_branch=""
 
   if [[ -n "$branch" ]]; then
-    # Specific branch provided
-    target_path="$worktree_parent/${repo_name}-${branch}"
-    target_branch="$branch"
+    # Specific branch provided - flatten slashes the same way wtree does.
+    # Passing the flattened directory name works too, since flattening is idempotent.
+    target_path="$worktree_parent/${repo_name}-${branch//\//-}"
   else
     # No branch provided - try to delete current worktree
-    # Check if we're in a worktree (not the main repo)
-    if [[ "$current_path" == "$repo_root" ]] || [[ "$current_path" == "$repo_root/"* && "$current_path" != "$worktree_parent/${repo_name}-"* ]]; then
+    local current_root
+    current_root=$(git rev-parse --show-toplevel 2>/dev/null)
+
+    if [[ "$current_root" == "$repo_root" ]]; then
       echo "Error: You're in the main repository, not a worktree."
       echo "Usage: wtdel <branch-name> or wtdel --all"
       return 1
     fi
 
-    # Check if current path matches worktree pattern
-    if [[ "$current_path" != "$worktree_parent/${repo_name}-"* ]]; then
+    # Check if current worktree matches our naming pattern
+    if [[ "$current_root" != "$worktree_parent/${repo_name}-"* ]]; then
       echo "Error: Current directory doesn't appear to be a worktree."
       return 1
     fi
 
-    target_path=$(echo "$current_path" | grep -o "^${worktree_parent}/${repo_name}-[^/]*")
-    target_branch=$(basename "$target_path")
-    target_branch=${target_branch#${repo_name}-}
+    target_path="$current_root"
   fi
 
   # Verify worktree exists
   if ! git -C "$repo_root" worktree list | grep -q "^${target_path}[[:space:]]"; then
     echo "Error: No worktree found at ${target_path}"
     return 1
+  fi
+
+  # Read the checked-out branch from git rather than the directory name
+  target_branch=$(_wt_branch_at "$target_path")
+  if [[ -z "$target_branch" ]]; then
+    target_branch="$branch"
   fi
 
   # Confirm if deleting current worktree (no explicit branch provided)
@@ -169,7 +186,7 @@ wtdel() {
 
   # Delete the branch if requested (but not main/master)
   if [[ "$delete_branch_choice" == "Delete worktree + branch" ]]; then
-    if [[ "$target_branch" != "main" && "$target_branch" != "master" ]]; then
+    if [[ -n "$target_branch" && "$target_branch" != "main" && "$target_branch" != "master" ]]; then
       git branch -D "$target_branch" 2>/dev/null && echo "Deleted branch: ${target_branch}"
     fi
   fi
