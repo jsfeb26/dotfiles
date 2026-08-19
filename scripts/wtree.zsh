@@ -1,151 +1,111 @@
 # wtree: Create a new worktree for each given branch.
-# Usage: wtree [-s|--setup] [-r|--run] [--pm npm|pnpm] branch1 branch2 ...
+# Usage: wtree [-n|--no-setup] [-r|--run] [--pm npm|pnpm] branch1 branch2 ...
 #
 # Flags:
-#   -s, --setup    Copy .env from main repo and install dependencies
-#   -r, --run      Implies --setup, plus starts dev server on port 3001 (single branch only)
-#   --pm <manager> Package manager to use (npm or pnpm, default: npm)
+#   -n, --no-setup  Skip .env copy and dependency install (setup runs by default)
+#   -r, --run       Start dev server on port 3001 after setup (single branch only)
+#   --pm <manager>  Package manager to use (npm or pnpm, default: pnpm)
 #
+# If the branch exists on origin it is checked out as-is (PR review flow).
+# Otherwise a new branch is created from origin/main (or master).
 # Creates worktrees as siblings to the repo: <repoName>-<branch>
-# Opens Cursor automatically after creating the worktree.
+# Slashes in the branch name are flattened to dashes in the directory name, so
+# `wtree darshan/foo` in `product` creates `product-darshan-foo` (single level).
 wtree() {
-  # Flags
-  local setup=false
+  local setup=true
   local run_app=false
   local package_manager="pnpm"
   local branches=()
 
-  # Parse command-line arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -s|--setup)
-        setup=true
-        shift
-        ;;
-      -r|--run)
-        run_app=true
-        setup=true
-        shift
-        ;;
-      --pm)
-        package_manager="$2"
-        shift 2
-        ;;
-      *)
-        branches+=("$1")
-        shift
-        ;;
+      -n|--no-setup) setup=false; shift ;;
+      -r|--run)      run_app=true; shift ;;
+      --pm)          package_manager="$2"; shift 2 ;;
+      *)             branches+=("$1"); shift ;;
     esac
   done
 
-  # Ensure at least one branch name is provided.
   if [[ ${#branches[@]} -eq 0 ]]; then
-    echo "Usage: wtree [-s|--setup] [-r|--run] [--pm npm|pnpm] branch1 branch2 ..."
+    echo "Usage: wtree [-n|--no-setup] [-r|--run] [--pm npm|pnpm] branch1 branch2 ..."
     return 1
   fi
 
-  # -r/--run only works with a single branch
   if $run_app && [[ ${#branches[@]} -gt 1 ]]; then
-    echo "Error: --run flag only works with a single branch."
+    echo "✗ --run only works with a single branch."
     return 1
   fi
 
-  # Determine the current branch; exit if not in a git repository.
-  local current_branch
-  current_branch=$(git rev-parse --abbrev-ref HEAD) || {
-    echo "Error: Not a git repository."
-    return 1
-  }
-
-  # Determine repository root and name.
   local repo_root repo_name
-  repo_root=$(git rev-parse --show-toplevel) || {
-    echo "Error: Cannot determine repository root."
-    return 1
-  }
-  repo_name=$(basename "$repo_root")
-
-  # TODO: Uncomment if you want a fixed parent directory for worktrees
-  # # Set fixed parent directory for worktrees.
-  # local worktree_parent="$HOME/dev"
-  # # Ensure the worktree parent directory exists.
-  # if [[ ! -d "$worktree_parent" ]]; then
-  #   if ! mkdir -p "$worktree_parent"; then
-  #     echo "Error: Failed to create worktree parent directory: $worktree_parent"
-  #     return 1
-  #   fi
-  # fi
-
-  # Set parent directory as the parent of the repo root. So the worktrees are in
-  # the same directory and sibling to the repo.
-  local repo_root repo_name
-  repo_root=$(git rev-parse --show-toplevel) || {
-    echo "Error: Cannot determine repository root."
-    return 1
-  }
+  repo_root=$(git rev-parse --show-toplevel) || { echo "✗ Not a git repository."; return 1; }
   repo_name=$(basename "$repo_root")
   local worktree_parent=$(dirname "$repo_root")
 
+  local base_branch="main"
+  if ! git rev-parse --verify "origin/${base_branch}" >/dev/null 2>&1; then
+    git rev-parse --verify origin/master >/dev/null 2>&1 && base_branch="master"
+  fi
 
-  # Loop over each branch provided as argument.
   for branch in "${branches[@]}"; do
-    # Define the target path using a naming convention: <repoName>-<branch>
-    local target_path="$worktree_parent/${repo_name}-${branch}"
-    
-    echo "Processing branch: ${branch}"
+    # Flatten slashes so a branch like darshan/foo becomes <repo>-darshan-foo
+    local dir_name="${repo_name}-${branch//\//-}"
+    local target_path="$worktree_parent/${dir_name}"
 
-    # Check if a worktree already exists at the target path.
+    echo ""
+    echo "🌿 Creating worktree ${dir_name} (branch ${branch})"
+
     if git worktree list | grep -q "^${target_path}[[:space:]]"; then
-      echo "Error: Worktree already exists at ${target_path}. Skipping branch '${branch}'."
+      echo "   ✗ Worktree already exists. Skipping."
       continue
     fi
 
-    # If the branch does not exist, create it from origin/main.
     if ! git show-ref --verify --quiet "refs/heads/${branch}"; then
-      echo "Branch '${branch}' does not exist. Creating it from 'origin/main'..."
-      git fetch origin main --quiet
-      if ! git branch "${branch}" origin/main; then
-        echo "Error: Failed to create branch '${branch}'. Skipping."
-        continue
+      if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
+        echo "   ↳ pulling existing branch ${branch}"
+        git fetch origin "${branch}" --quiet
+        if ! git branch "${branch}" "origin/${branch}" >/dev/null 2>&1; then
+          echo "   ✗ Failed to create tracking branch. Skipping."
+          continue
+        fi
+      else
+        echo "   ↳ creating branch ${branch} from origin/${base_branch}"
+        git fetch origin "${base_branch}" --quiet
+        if ! git branch "${branch}" "origin/${base_branch}" >/dev/null 2>&1; then
+          echo "   ✗ Failed to create branch. Skipping."
+          continue
+        fi
       fi
     fi
 
-    # Create the new worktree for the branch.
-    echo "Creating worktree for branch '${branch}' at ${target_path}..."
-    if ! git worktree add "$target_path" "${branch}"; then
-      echo "Error: Failed to create worktree for branch '${branch}'. Skipping."
+    if ! git worktree add "$target_path" "${branch}" --quiet 2>/dev/null; then
+      echo "   ✗ Failed to create worktree. Skipping."
       continue
     fi
 
-    # Open Cursor immediately (before install so you can start looking at code)
-    if type cursor >/dev/null 2>&1; then
-      cursor "$target_path"
-    else
-      echo "Worktree created at: ${target_path}"
-    fi
+    echo ""
+    echo "➡  cd ${dir_name}"
+    cd "$target_path"
 
-    # Change to the new worktree directory
-    cd "$target_path" || return 1
-
-    # Handle setup and run flags
     if $setup; then
-      # Copy .env from main repo
       if [[ -f "$repo_root/.env" ]]; then
-        echo "Copying .env from main repo..."
+        echo ""
+        echo "📄 copying .env from main repo"
         cp "$repo_root/.env" "$target_path/.env"
       fi
 
-      # Install dependencies
-      echo "Installing dependencies using ${package_manager}..."
+      echo ""
+      echo "🛠  installing dependencies with ${package_manager}"
       $package_manager install
 
-      # Start dev server if run flag is set
       if $run_app; then
+        echo ""
+        echo "🚀 starting dev server on port 3001"
         $package_manager start -- --port 3001
       fi
     fi
 
-    echo "Worktree for branch '${branch}' created successfully."
-    echo "-----------------------------------------------------"
+    echo ""
+    echo "✅ done"
   done
+  echo ""
 }

@@ -1,37 +1,12 @@
 #!/usr/bin/env bash
 
+# wtpr is a thin wrapper around wtree.
+# wtree now handles both new branches and existing PR branches automatically:
+# if the branch exists on origin it is fetched and checked out as-is;
+# otherwise a new branch is created from the base branch.
+#
+# Usage: wtpr [-n|--no-setup] [-r|--run] [--pm npm|pnpm] <branch>
+
 set -euo pipefail
 
-no_setup=false
-branch=""
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    -n|--no-setup)
-      no_setup=true
-      shift
-      ;;
-    -h|--help)
-      echo "Usage: wtpr [-n|--no-setup] <remote-branch-name>"
-      exit 0
-      ;;
-    *)
-      branch="$1"
-      shift
-      ;;
-  esac
-done
-
-if [[ -z "$branch" ]]; then
-  echo "Usage: wtpr [-n|--no-setup] <remote-branch-name>" >&2
-  exit 1
-fi
-
-git fetch origin "$branch"
-git branch "$branch" "origin/$branch" 2>/dev/null || true
-
-if [[ "$no_setup" == true ]]; then
-  wtree "$branch"
-else
-  wtree -r "$branch"
-fi
+exec wtree "$@"

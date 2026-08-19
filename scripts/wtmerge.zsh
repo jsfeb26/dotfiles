@@ -44,8 +44,7 @@ wtmerge() {
   local worktrees=()
   while IFS= read -r line; do
     # Extract the worktree path (first field)
-    local wt_path
-    wt_path=$(echo "$line" | awk '{print $1}')
+    local wt_path=$(echo "$line" | awk '{print $1}')
     # Only consider worktrees under our fixed parent directory that match "<repo_name>-*"
     if [[ "$wt_path" == "$worktree_parent/${repo_name}-"* ]]; then
       worktrees+=("$wt_path")
@@ -59,8 +58,9 @@ wtmerge() {
 
     # Check target branch exists...
     local target_worktree=""
+    # Slashes are flattened to dashes in worktree directory names (see wtree)
     for wt in "${worktrees[@]}"; do
-      if [[ "$wt" == "$worktree_parent/${repo_name}-${branch_to_keep}" ]]; then
+      if [[ "$wt" == "$worktree_parent/${repo_name}-${branch_to_keep//\//-}" ]]; then
         target_worktree="$wt"
         break
       fi
@@ -98,12 +98,10 @@ wtmerge() {
   # Step 4: Remove all worktrees that were created via wtree().
   echo "Cleaning up worktrees and deleting temporary branches..."
   for wt in "${worktrees[@]}"; do
-    # Extract branch name from worktree path.
-    local wt_branch
-    wt_branch=$(basename "$wt")
-    wt_branch=${wt_branch#${repo_name}-}  # Remove the repo name prefix
+    # Read the branch from git; the path can't be reversed once slashes are flattened.
+    local wt_branch=$(git -C "$wt" symbolic-ref --quiet --short HEAD 2>/dev/null)
 
-    echo "Processing worktree for branch '${wt_branch}' at ${wt}..."
+    echo "Processing worktree for branch '${wt_branch:-<detached>}' at ${wt}..."
     # Remove the worktree using --force to ensure removal.
     if git worktree remove "$wt" --force; then
       echo "Worktree at ${wt} removed."
@@ -112,7 +110,7 @@ wtmerge() {
     fi
 
     # Do not delete the 'main' branch.
-    if [[ "$wt_branch" != "main" ]]; then
+    if [[ -n "$wt_branch" && "$wt_branch" != "main" ]]; then
       if git branch -D "$wt_branch"; then
         echo "Branch '${wt_branch}' deleted."
       else

@@ -9,17 +9,17 @@ Usage: delete-branches [OPTIONS]
 OPTIONS:
   -s, --specific PATTERN...  Delete branches matching the given patterns
   -e, --exclude PATTERN...   Exclude branches matching the given patterns
-  -o, --old                  Delete only branches older than one month
+  -o, --old                  Delete only branches older than six months
   -v, --verbose              Show why each branch is selected
   -h, --help                 Show this help message
 EOF
 }
 
-one_month_ago_epoch() {
-  if date -d '1 month ago' +%s >/dev/null 2>&1; then
-    date -d '1 month ago' +%s
+six_months_ago_epoch() {
+  if date -d '6 months ago' +%s >/dev/null 2>&1; then
+    date -d '6 months ago' +%s
   else
-    date -v-1m +%s
+    date -v-6m +%s
   fi
 }
 
@@ -145,14 +145,14 @@ if ! git rev-parse --git-dir >/dev/null 2>&1; then
 fi
 
 if [[ "$old_mode" == true ]]; then
-  month_ago="$(one_month_ago_epoch)"
+  six_months_ago="$(six_months_ago_epoch)"
 fi
 
 invalid_patterns=()
-for pattern in "${target_patterns[@]}"; do
+for pattern in ${target_patterns[@]+"${target_patterns[@]}"}; do
   validate_pattern "$pattern" || invalid_patterns+=("$pattern")
 done
-for pattern in "${exclude_patterns[@]}"; do
+for pattern in ${exclude_patterns[@]+"${exclude_patterns[@]}"}; do
   validate_pattern "$pattern" || invalid_patterns+=("$pattern")
 done
 
@@ -163,7 +163,7 @@ if [[ ${#invalid_patterns[@]} -gt 0 ]]; then
 fi
 
 branches_to_delete=()
-branches_to_delete_info=()
+branch_details=()
 
 while IFS=' ' read -r branch epoch; do
   total_branches=$((total_branches + 1))
@@ -176,7 +176,7 @@ while IFS=' ' read -r branch epoch; do
   selection_reason=""
 
   if [[ "$specific_mode" == true ]]; then
-    for pattern in "${target_patterns[@]}"; do
+    for pattern in ${target_patterns[@]+"${target_patterns[@]}"}; do
       if match_pattern "$branch" "$pattern"; then
         is_candidate=true
         selection_reason="matches: $pattern"
@@ -191,7 +191,7 @@ while IFS=' ' read -r branch epoch; do
 
   should_exclude=false
   if [[ "$exclude_mode" == true ]]; then
-    for pattern in "${exclude_patterns[@]}"; do
+    for pattern in ${exclude_patterns[@]+"${exclude_patterns[@]}"}; do
       if match_pattern "$branch" "$pattern"; then
         should_exclude=true
         break
@@ -201,7 +201,7 @@ while IFS=' ' read -r branch epoch; do
 
   [[ "$should_exclude" == false ]] || continue
 
-  if [[ "$old_mode" == true && "$epoch" -ge "$month_ago" ]]; then
+  if [[ "$old_mode" == true && "$epoch" -ge "$six_months_ago" ]]; then
     continue
   fi
 
@@ -218,24 +218,77 @@ while IFS=' ' read -r branch epoch; do
     details+=("last updated: $display_date")
   fi
 
-  if [[ ${#details[@]} -gt 0 ]]; then
-    branches_to_delete_info+=("Will delete: $branch (${details[*]})")
-  else
-    branches_to_delete_info+=("Will delete: $branch")
-  fi
-done < <(git branch --format='%(refname:short) %(committerdate:unix)')
+  branch_details+=("${details[*]}")
+done < <(git branch --sort=committerdate --format='%(refname:short) %(committerdate:unix)')
 
 if [[ ${#branches_to_delete[@]} -eq 0 ]]; then
   echo "No matching branches found."
   exit 0
 fi
 
-printf '%s\n' "${branches_to_delete_info[@]}"
-printf '\nFound %s out of %s branches to delete.\n' "${#branches_to_delete[@]}" "$total_branches"
-read -r -p "Do you want to proceed? (y/N) " reply
+# Pad branch names so the details column lines up
+max_branch_length=0
+for branch in "${branches_to_delete[@]}"; do
+  if [[ ${#branch} -gt $max_branch_length ]]; then
+    max_branch_length=${#branch}
+  fi
+done
 
-if [[ "$reply" =~ ^[Yy]$ ]]; then
-  for branch in "${branches_to_delete[@]}"; do
+display_lines=()
+for index in "${!branches_to_delete[@]}"; do
+  display_lines+=("$(printf '%-*s  %s' "$max_branch_length" "${branches_to_delete[$index]}" "${branch_details[$index]}")")
+done
+
+if command -v fzf >/dev/null 2>&1; then
+  # Live header: selected count updates as toggle keys are pressed
+  header_command="echo \"Deleting \$FZF_SELECT_COUNT of $total_branches branches — space to toggle, enter to confirm\""
+
+  # Pre-select every branch; space/tab deselects, enter confirms, esc cancels
+  selected_lines="$(printf '%s\n' "${display_lines[@]}" | fzf --multi --sync \
+    --layout=reverse \
+    --height='~80%' \
+    --marker='✓ ' \
+    --bind "start:select-all+transform-header:$header_command" \
+    --bind "space:toggle+down+transform-header:$header_command" \
+    --bind "tab:toggle+down+transform-header:$header_command" \
+    --bind "ctrl-a:select-all+transform-header:$header_command" \
+    --bind "ctrl-d:deselect-all+transform-header:$header_command")" || true
+
+  if [[ -z "$selected_lines" ]]; then
+    echo "Cancelled."
+    exit 0
+  fi
+
+  selected_branches=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    selected_branches+=("${line%% *}")
+  done <<< "$selected_lines"
+
+  if command -v gum >/dev/null 2>&1; then
+    if ! gum confirm "Delete ${#selected_branches[@]} branch(es)?"; then
+      echo "Cancelled."
+      exit 0
+    fi
+  else
+    read -r -p "Delete ${#selected_branches[@]} branch(es)? (y/N) " reply
+    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+      echo "Cancelled."
+      exit 0
+    fi
+  fi
+
+  for branch in "${selected_branches[@]}"; do
     git branch -D "$branch"
   done
+else
+  printf '%s\n' "${display_lines[@]}"
+  printf '\nFound %s out of %s branches to delete.\n' "${#branches_to_delete[@]}" "$total_branches"
+  read -r -p "Do you want to proceed? (y/N) " reply
+
+  if [[ "$reply" =~ ^[Yy]$ ]]; then
+    for branch in "${branches_to_delete[@]}"; do
+      git branch -D "$branch"
+    done
+  fi
 fi

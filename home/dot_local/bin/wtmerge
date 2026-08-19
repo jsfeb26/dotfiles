@@ -7,6 +7,13 @@ if [[ $# -ne 0 && $# -ne 2 ]]; then
   exit 1
 fi
 
+# wtree flattens slashes in branch names to dashes in the worktree directory
+# name, so the branch can't be recovered from the path. Ask git instead.
+# Prints nothing when the worktree is in a detached HEAD state.
+branch_at() {
+  git -C "$1" symbolic-ref --quiet --short HEAD 2>/dev/null || true
+}
+
 repo_root="$(git rev-parse --show-toplevel)"
 repo_name="$(basename "$repo_root")"
 worktree_parent="$(dirname "$repo_root")"
@@ -18,7 +25,11 @@ if ! git -C "$repo_root" rev-parse --verify "refs/heads/${base_branch}" >/dev/nu
   fi
 fi
 
-mapfile -t worktrees < <(
+# Plain read loop rather than mapfile: macOS ships bash 3.2, which lacks it
+worktrees=()
+while IFS= read -r wt_path; do
+  [[ -n "$wt_path" ]] && worktrees+=("$wt_path")
+done < <(
   git -C "$repo_root" worktree list |
     awk '{print $1}' |
     grep "^${worktree_parent}/${repo_name}-" || true
@@ -27,7 +38,7 @@ mapfile -t worktrees < <(
 if [[ $# -eq 2 ]]; then
   branch_to_keep="$1"
   commit_message="$2"
-  target_worktree="${worktree_parent}/${repo_name}-${branch_to_keep}"
+  target_worktree="${worktree_parent}/${repo_name}-${branch_to_keep//\//-}"
 
   if [[ ! -d "$target_worktree" ]]; then
     echo "No active worktree found for ${branch_to_keep}." >&2
@@ -54,12 +65,11 @@ if [[ $# -eq 2 ]]; then
 fi
 
 for wt in "${worktrees[@]}"; do
-  wt_branch="$(basename "$wt")"
-  wt_branch="${wt_branch#${repo_name}-}"
+  wt_branch="$(branch_at "$wt")"
 
   git -C "$repo_root" worktree remove "$wt" --force || true
 
-  if [[ "$wt_branch" != "$base_branch" ]]; then
+  if [[ -n "$wt_branch" && "$wt_branch" != "$base_branch" ]]; then
     git -C "$repo_root" branch -D "$wt_branch" 2>/dev/null || true
   fi
 done

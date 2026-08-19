@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./bootstrap.sh --profile personal|studio|devbox
+Usage: ./bootstrap.sh --profile personal|studio|devbox|stackmod
 
 Bootstraps this repo with chezmoi.
 
@@ -12,6 +12,7 @@ Examples:
   ./bootstrap.sh --profile personal
   ./bootstrap.sh --profile studio
   ./bootstrap.sh --profile devbox
+  ./bootstrap.sh --profile stackmod
 EOF
 }
 
@@ -148,17 +149,17 @@ main() {
 
   if [[ -z "$profile" ]]; then
     echo "Error: --profile is required." >&2
-    echo "Valid values: personal, studio, devbox" >&2
+    echo "Valid values: personal, studio, devbox, stackmod" >&2
     echo "" >&2
     usage >&2
     exit 1
   fi
 
   case "$profile" in
-    personal|studio|devbox) ;;
+    personal|studio|devbox|stackmod) ;;
     *)
       echo "Error: invalid profile '${profile}'." >&2
-      echo "Valid values: personal, studio, devbox" >&2
+      echo "Valid values: personal, studio, devbox, stackmod" >&2
       exit 1
       ;;
   esac

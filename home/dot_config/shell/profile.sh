@@ -10,3 +10,6 @@ shell_source() {
 
 shell_source "$HOME/.config/shell/env.sh"
 shell_source "$HOME/.config/shell/path.sh"
+
+# Fixes the flicker issue in Claude Code
+export CLAUDE_CODE_NO_FLICKER=1

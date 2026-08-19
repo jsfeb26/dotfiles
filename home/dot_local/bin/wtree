@@ -4,24 +4,33 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: wtree [-s|--setup] [-r|--run] [--pm npm|pnpm] branch1 [branch2 ...]
+Usage: wtree [-n|--no-setup] [-r|--run] [--pm npm|pnpm] branch1 [branch2 ...]
+
+  -n, --no-setup   Skip .env copy and dependency install
+  -r, --run        Start dev server on port 3001 (single branch only)
+  --pm <manager>   Package manager to use (default: pnpm)
+
+If the branch exists on origin it is checked out as-is (PR review).
+Otherwise a new branch is created from origin/main (or master).
+
+Slashes in the branch name are flattened to dashes in the worktree directory
+name, so `wtree darshan/foo` in `product` creates `product-darshan-foo`.
 EOF
 }
 
-setup=false
+setup=true
 run_app=false
 package_manager="pnpm"
 branches=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -s|--setup)
-      setup=true
+    -n|--no-setup)
+      setup=false
       shift
       ;;
     -r|--run)
       run_app=true
-      setup=true
       shift
       ;;
     --pm)
@@ -61,7 +70,8 @@ if ! git rev-parse --verify "origin/${base_branch}" >/dev/null 2>&1; then
 fi
 
 for branch in "${branches[@]}"; do
-  target_path="${worktree_parent}/${repo_name}-${branch}"
+  # Flatten slashes so a branch like darshan/foo becomes <repo>-darshan-foo
+  target_path="${worktree_parent}/${repo_name}-${branch//\//-}"
 
   if git worktree list | grep -q "^${target_path}[[:space:]]"; then
     echo "Worktree already exists at ${target_path}. Skipping ${branch}."
@@ -69,18 +79,20 @@ for branch in "${branches[@]}"; do
   fi
 
   if ! git show-ref --verify --quiet "refs/heads/${branch}"; then
-    echo "Creating ${branch} from origin/${base_branch}..."
-    git fetch origin "$base_branch" --quiet
-    git branch "$branch" "origin/${base_branch}"
+    if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
+      echo "Found '${branch}' on origin, checking out as local tracking branch..."
+      git fetch origin "${branch}" --quiet
+      git branch "${branch}" "origin/${branch}"
+    else
+      echo "Creating ${branch} from origin/${base_branch}..."
+      git fetch origin "${base_branch}" --quiet
+      git branch "${branch}" "origin/${base_branch}"
+    fi
   fi
 
   git worktree add "$target_path" "$branch"
 
-  if command -v cursor >/dev/null 2>&1; then
-    cursor "$target_path"
-  else
-    echo "Created worktree: $target_path"
-  fi
+  echo "Created worktree: $target_path"
 
   if [[ "$setup" == true ]]; then
     if [[ -f "${repo_root}/.env" ]]; then

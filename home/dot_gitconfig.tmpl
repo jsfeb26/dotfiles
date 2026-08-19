@@ -13,6 +13,10 @@
   pb = !~/.local/bin/push-branch
   z = !~/.local/bin/switch-previous-branch
   wb = !~/.local/bin/find-commit-branch
+  # Archive untracked files to ~/dev/git-archives/<repo>-<date>/
+  discard = !~/dotfiles/scripts/git-archive-untracked
+  # Discard all changes — restore tracked files and archive untracked
+  nuke = !git restore . && git discard
 [user]
   email = {{ .git_email }}
   name = {{ .git_name }}

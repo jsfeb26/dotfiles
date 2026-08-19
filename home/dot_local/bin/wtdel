@@ -9,6 +9,13 @@ Usage: wtdel [branch]
 EOF
 }
 
+# wtree flattens slashes in branch names to dashes in the worktree directory
+# name, so the branch can't be recovered from the path. Ask git instead.
+# Prints nothing when the worktree is in a detached HEAD state.
+branch_at() {
+  git -C "$1" symbolic-ref --quiet --short HEAD 2>/dev/null || true
+}
+
 delete_all=false
 branch=""
 
@@ -29,12 +36,18 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-repo_root="$(git rev-parse --show-toplevel)"
+# Resolve the MAIN repo root, not the current worktree root: --show-toplevel
+# returns the worktree root when run from inside a worktree.
+git_common_dir="$(cd "$(git rev-parse --git-common-dir)" && pwd)"
+repo_root="$(dirname "$git_common_dir")"
 repo_name="$(basename "$repo_root")"
 worktree_parent="$(dirname "$repo_root")"
-current_path="$(pwd)"
 
-mapfile -t managed_worktrees < <(
+# Plain read loop rather than mapfile: macOS ships bash 3.2, which lacks it
+managed_worktrees=()
+while IFS= read -r wt_path; do
+  [[ -n "$wt_path" ]] && managed_worktrees+=("$wt_path")
+done < <(
   git -C "$repo_root" worktree list |
     awk '{print $1}' |
     grep "^${worktree_parent}/${repo_name}-" || true
@@ -56,10 +69,9 @@ if [[ "$delete_all" == true ]]; then
   fi
 
   for wt in "${managed_worktrees[@]}"; do
-    wt_branch="$(basename "$wt")"
-    wt_branch="${wt_branch#${repo_name}-}"
+    wt_branch="$(branch_at "$wt")"
     git -C "$repo_root" worktree remove "$wt" --force
-    if [[ "$delete_branch_answer" =~ ^[Yy]$ ]] && [[ "$wt_branch" != "main" && "$wt_branch" != "master" ]]; then
+    if [[ "$delete_branch_answer" =~ ^[Yy]$ ]] && [[ -n "$wt_branch" && "$wt_branch" != "main" && "$wt_branch" != "master" ]]; then
       git -C "$repo_root" branch -D "$wt_branch" 2>/dev/null || true
     fi
   done
@@ -68,8 +80,9 @@ if [[ "$delete_all" == true ]]; then
 fi
 
 if [[ -n "$branch" ]]; then
-  target_path="${worktree_parent}/${repo_name}-${branch}"
-  target_branch="$branch"
+  # Flatten slashes the same way wtree does. Passing the flattened directory
+  # name works too, since flattening is idempotent.
+  target_path="${worktree_parent}/${repo_name}-${branch//\//-}"
 else
   current_git_root="$(git rev-parse --show-toplevel)"
   if [[ "$current_git_root" == "$repo_root" ]]; then
@@ -78,13 +91,16 @@ else
   fi
 
   target_path="$current_git_root"
-  target_branch="$(basename "$target_path")"
-  target_branch="${target_branch#${repo_name}-}"
 fi
 
 if ! git -C "$repo_root" worktree list | grep -q "^${target_path}[[:space:]]"; then
   echo "No worktree found at ${target_path}." >&2
   exit 1
+fi
+
+target_branch="$(branch_at "$target_path")"
+if [[ -z "$target_branch" ]]; then
+  target_branch="$branch"
 fi
 
 echo "Worktree: ${target_path}"
@@ -97,6 +113,6 @@ if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
 fi
 
 git -C "$repo_root" worktree remove "$target_path" --force
-if [[ "$delete_branch_answer" =~ ^[Yy]$ ]] && [[ "$target_branch" != "main" && "$target_branch" != "master" ]]; then
+if [[ "$delete_branch_answer" =~ ^[Yy]$ ]] && [[ -n "$target_branch" && "$target_branch" != "main" && "$target_branch" != "master" ]]; then
   git -C "$repo_root" branch -D "$target_branch" 2>/dev/null || true
 fi

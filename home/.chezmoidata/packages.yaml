@@ -1,6 +1,7 @@
 brew:
   common:
     - atuin
+    - font-fira-code
     - bat
     - diff-so-fancy
     - fd
@@ -37,7 +38,6 @@ casks:
   personal:
     - 1password
     - bitwarden
-    - font-fira-code-nerd-font
     - thebrowsercompany-dia
     - bartender
     - betterdisplay
@@ -58,7 +58,6 @@ casks:
     - visual-studio-code
   studio:
     - bitwarden
-    - font-fira-code-nerd-font
     - thebrowsercompany-dia
     - bartender
     - betterdisplay

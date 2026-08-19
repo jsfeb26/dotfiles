@@ -30,8 +30,10 @@ install_vim_plug() {
 
 install_nvm
 install_if_missing "starship" "curl -fsSL https://starship.rs/install.sh | sh -s -- -y"
+{{- if ne .profile "stackmod" }}
 install_if_missing "atuin" "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
 install_if_missing "uv" "curl -LsSf https://astral.sh/uv/install.sh | sh"
+{{- end }}
 install_vim_plug
 
 if [[ -s "${HOME}/.nvm/nvm.sh" ]]; then

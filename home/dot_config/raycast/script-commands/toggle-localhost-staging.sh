@@ -31,6 +31,9 @@ EOF
 if [[ "$chrome_url" =~ ^http://localhost:3000(/.*)?$ ]]; then
   path="${chrome_url#http://localhost:3000}"
   new_url="https://product.eng.ambient.ai$path"
+elif [[ "$chrome_url" =~ ^http://localhost:3001(/.*)?$ ]]; then
+  path="${chrome_url#http://localhost:3001}"
+  new_url="https://product.eng.ambient.ai$path"
 elif [[ "$chrome_url" =~ ^https://product-staging\.ambient\.ai(/.*)?$ ]]; then
   path="${chrome_url#https://product-staging.ambient.ai}"
   new_url="http://localhost:3000$path"
@@ -38,7 +41,7 @@ elif [[ "$chrome_url" =~ ^https://product\.eng\.ambient\.ai(/.*)?$ ]]; then
   path="${chrome_url#https://product.eng.ambient.ai}"
   new_url="http://localhost:3000$path"
 else
-  echo "Not on localhost:3000, product-staging.ambient.ai, or product.eng.ambient.ai."
+  echo "Not on localhost:3000, localhost:3001, product-staging.ambient.ai, or product.eng.ambient.ai."
   exit 0
 fi
 

@@ -158,6 +158,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # alias opus='ENABLE_BACKGROUND_TASKS=1 claude --model opus'
 alias opus='claude --model opus'
 
+# Fixes the flicker issue in Claude Code
+export CLAUDE_CODE_NO_FLICKER=1
+
 # The "$@" is a zsh thing that allows you to pass all the arguments to the function
 dopus() {
   claude --model opus --dangerously-skip-permissions "$@"
@@ -168,7 +171,7 @@ popus() {
 }
 
 ccdanger() {
-  claude --model default --dangerously-skip-permissions "$@"
+  claude --dangerously-skip-permissions "$@"
 }
 
 . "$HOME/.atuin/bin/env"
@@ -191,3 +194,8 @@ ccdotfiles() {
 export PATH="/Users/jasonstinson/.antigravity/antigravity/bin:$PATH"
 
 alias design-starter="/Users/jasonstinson/dev/design-starter/design-starter"
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+# opencode
+export PATH=/Users/jasonstinson/.opencode/bin:$PATH

@@ -11,7 +11,15 @@
       "Bash(npm install:*)",
       "Bash(npm run lint)",
       "Bash(npm run dev)",
-      "Bash(~/.claude-code-docs/claude-docs-helper.sh:*)"
+      "Bash(pnpm install:*)",
+      "Bash(pnpm run dev)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm run test)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm run start)",
+      "Bash(pnpm run serve)",
+      "Bash(pnpm run test:e2e)",
+      "Bash(pnpm run test:unit)"
     ],
     "deny": [
       "Bash(rm -rf *)",
@@ -19,15 +27,13 @@
       "Bash(rm -rf ~/*:*)",
       "Bash(sudo rm -rf:*)",
       "Bash(mkfs:*)",
-      "Bash(dd if=* of=/dev/*:*)"
+      "Bash(dd if=* of=/dev/*:*)",
+      "Read(./.env)",
+      "Read(./.env.*)"
     ],
-    "ask": [
-      "Bash(git push --force:*)",
-      "Bash(git reset --hard:*)"
-    ],
-    "defaultMode": "acceptEdits"
+    "ask": ["Bash(git push --force:*)", "Bash(git reset --hard:*)"],
+    "defaultMode": "auto"
   },
-  "model": "opus[1m]",
   "hooks": {
     "Stop": [
       {
@@ -41,15 +47,6 @@
       }
     ],
     "PreToolUse": [
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude-code-docs/claude-docs-helper.sh hook-check"
-          }
-        ]
-      },
       {
         "matcher": "Bash",
         "hooks": [
@@ -82,16 +79,88 @@
       }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
-  },
   "enabledPlugins": {
     "frontend-design@claude-code-plugins": true,
     "code-simplifier@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "figma@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "obsidian-skills": {
+      "source": {
+        "source": "github",
+        "repo": "kepano/obsidian-skills"
+      }
+    }
+  },
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "Gravitating",
+      "Warping",
+      "Orbiting",
+      "Quantizing",
+      "Redshifting",
+      "Singularizing",
+      "Relativizing",
+      "Photonizing",
+      "Nebulizing",
+      "Superpositioning",
+      "Fusing",
+      "Collapsing",
+      "Entangling",
+      "Docking",
+      "Thrusting",
+      "Traversing",
+      "Terraforming",
+      "Wormholing",
+      "Hypersleeping",
+      "Slingshoting",
+      "Transmitting",
+      "Deorbiting",
+      "Pressurizing",
+      "Recalibrating",
+      "Propelling",
+      "Interstellaring",
+      "Fastbreaking",
+      "Posterizing",
+      "Eurosteping",
+      "Crossingover",
+      "Splashing",
+      "Dunking",
+      "Alleyooping",
+      "Buzzerbeating",
+      "Pickandrolling",
+      "Boxingout",
+      "Transitioning",
+      "Gegenpressing",
+      "Overlapping",
+      "Counterattacking",
+      "Nutmegging",
+      "Dribbling",
+      "Channeling",
+      "Lobbing",
+      "Tikitakaing",
+      "Blitzing",
+      "Audibilizing",
+      "Scrambling",
+      "Juking",
+      "Stiffcarming",
+      "Redzooning",
+      "Sacking",
+      "Snapping",
+      "Halfbacking",
+      "Touchdowning",
+      "Hailmarying",
+      "Pressingforward",
+      "Counterscoring",
+      "Playmaking",
+      "Quantumleaping"
+    ]
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }

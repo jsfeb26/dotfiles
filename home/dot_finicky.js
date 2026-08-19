@@ -53,5 +53,25 @@ module.exports = {
       match: /^https:\/\/auth\.openai\.com\/.*$/,
       browser: "Google Chrome",
     },
+    {
+      // Linear
+      match: /^https:\/\/linear\.app\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
+      // CoderPad
+      match: /^https:\/\/app\.coderpad\.io\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
+      // Ashby
+      match: /^https:\/\/app\.ashbyhq\.com\/.*$/,
+      browser: "Google Chrome",
+    },
+    {
+      // Statsig
+      match: /^https:\/\/console\.statsig\.com\/.*$/,
+      browser: "Google Chrome",
+    },
   ],
 };

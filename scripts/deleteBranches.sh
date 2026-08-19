@@ -1,87 +1,91 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# If there is a permission error, run this command:
-# chmod +x scripts/deleteOldBranches.sh
+set -euo pipefail
 
-# Validate wildcard pattern
-validate_pattern() {
-  local pattern="$1"
-  
-  # Count asterisks in the pattern
-  asterisk_count=$(echo "$pattern" | tr -cd '*' | wc -c)
-  
-  # If no asterisks, it's a valid exact match pattern
-  if [ $asterisk_count -eq 0 ]; then
-    return 0
-  fi
-  
-  # If more than 2 asterisks, invalid
-  if [ $asterisk_count -gt 2 ]; then
-    return 1
-  fi
-  
-  # Check for valid wildcard positions
-  first_char="${pattern:0:1}"
-  last_char="${pattern: -1}"
-  
-  # Single asterisk cases
-  if [ $asterisk_count -eq 1 ]; then
-    if [ "$first_char" = "*" ] || [ "$last_char" = "*" ]; then
-      return 0
-    else
-      return 1  # Asterisk in middle is invalid
-    fi
-  fi
-  
-  # Double asterisk case - must be at beginning and end
-  if [ $asterisk_count -eq 2 ]; then
-    if [ "$first_char" = "*" ] && [ "$last_char" = "*" ]; then
-      return 0
-    else
-      return 1  # Invalid placement
-    fi
-  fi
-  
-  return 1
+usage() {
+  cat <<'EOF'
+Usage: delete-branches [OPTIONS]
+
+OPTIONS:
+  -s, --specific PATTERN...  Delete branches matching the given patterns
+  -e, --exclude PATTERN...   Exclude branches matching the given patterns
+  -o, --old                  Delete only branches older than six months
+  -v, --verbose              Show why each branch is selected
+  -h, --help                 Show this help message
+EOF
 }
 
-# Match branch against wildcard pattern
+six_months_ago_epoch() {
+  if date -d '6 months ago' +%s >/dev/null 2>&1; then
+    date -d '6 months ago' +%s
+  else
+    date -v-6m +%s
+  fi
+}
+
+format_epoch() {
+  if date -d "@$1" '+%Y-%m-%d' >/dev/null 2>&1; then
+    date -d "@$1" '+%Y-%m-%d'
+  else
+    date -r "$1" '+%Y-%m-%d'
+  fi
+}
+
+validate_pattern() {
+  local pattern="$1"
+  local asterisk_count
+  local first_char
+  local last_char
+
+  asterisk_count="$(printf '%s' "$pattern" | tr -cd '*' | wc -c | tr -d ' ')"
+  first_char="${pattern:0:1}"
+  last_char="${pattern: -1}"
+
+  if [[ "$asterisk_count" -eq 0 ]]; then
+    return 0
+  fi
+
+  if [[ "$asterisk_count" -gt 2 ]]; then
+    return 1
+  fi
+
+  if [[ "$asterisk_count" -eq 1 ]]; then
+    [[ "$first_char" == "*" || "$last_char" == "*" ]]
+    return $?
+  fi
+
+  [[ "$first_char" == "*" && "$last_char" == "*" ]]
+}
+
 match_pattern() {
   local branch="$1"
   local pattern="$2"
-  
-  # Exact match (no wildcards)
+
   if [[ "$pattern" != *"*"* ]]; then
-    [ "$branch" = "$pattern" ]
+    [[ "$branch" == "$pattern" ]]
     return $?
   fi
-  
-  # Leading wildcard only (*suffix)
+
   if [[ "$pattern" =~ ^\*[^*]+$ ]]; then
-    suffix="${pattern#\*}"
-    [[ "$branch" == *"$suffix" ]]
+    [[ "$branch" == *"${pattern#\*}" ]]
     return $?
   fi
-  
-  # Trailing wildcard only (prefix*)
+
   if [[ "$pattern" =~ ^[^*]+\*$ ]]; then
-    prefix="${pattern%\*}"
-    [[ "$branch" == "$prefix"* ]]
+    [[ "$branch" == "${pattern%\*}"* ]]
     return $?
   fi
-  
-  # Both leading and trailing wildcards (*middle*)
+
   if [[ "$pattern" =~ ^\*[^*]+\*$ ]]; then
-    middle="${pattern#\*}"
+    local middle="${pattern#\*}"
     middle="${middle%\*}"
     [[ "$branch" == *"$middle"* ]]
     return $?
   fi
-  
+
   return 1
 }
 
-# variables from command line arguments
 specific_mode=false
 exclude_mode=false
 old_mode=false
@@ -89,13 +93,10 @@ verbose_mode=false
 target_patterns=()
 exclude_patterns=()
 current_collection_mode="none"
-
-# 
 total_branches=0
 
-# Step 1: Parse command line arguments
 while [[ $# -gt 0 ]]; do
-  case $1 in
+  case "$1" in
     -v|--verbose)
       verbose_mode=true
       shift
@@ -112,148 +113,85 @@ while [[ $# -gt 0 ]]; do
       ;;
     -o|--old)
       old_mode=true
-      # -o does not take arguments, so we don't change collection mode
-      # forcing users to put patterns immediately after -s or -e
-      current_collection_mode="none" 
+      current_collection_mode="none"
       shift
       ;;
     -h|--help)
-      echo "Usage: $0 [OPTIONS] [patterns...]"
-      echo ""
-      echo "OPTIONS:"
-      echo "  -s, --specific    Delete branches matching specified patterns"
-      echo "  -e, --exclude     Exclude branches matching specified patterns"
-      echo "  -o, --old         Only delete branches older than 1 month"
-      echo "  -v, --verbose     Show detailed matching reasons"
-      echo "  -h, --help        Show this help message"
-      echo ""
-      echo "MODES:"
-      echo "  No flags          Delete ALL branches except main/master"
-      echo "  -o                Delete branches older than 1 month (except main/master)"
-      echo "  -s pattern1 ...   Delete branches matching patterns (any age)"
-      echo "  -e pattern1 ...   Exclude branches matching patterns"
-      echo "  -s -o pattern1 ... Delete branches matching patterns AND older than 1 month"
-      echo ""
-      echo "Pattern examples:"
-      echo "  \"AMB*\"      - matches branches starting with 'AMB'"
-      echo "  \"*AMB\"      - matches branches ending with 'AMB'"
-      echo "  \"*AMB*\"     - matches branches containing 'AMB'"
-      echo "  \"AMB\"       - matches branch named exactly 'AMB'"
-      echo ""
-      echo "Examples:"
-      echo "  $0                      # Delete all branches except main/master"
-      echo "  $0 -o                   # Delete old branches except main/master"
-      echo "  $0 -s \"AMB*\"          # Delete branches starting with AMB"
-      echo "  $0 -e \"important*\"    # Delete all except main/master and important*"
-      echo "  $0 -s \"AMB*\" -o       # Delete old branches starting with AMB"
+      usage
       exit 0
       ;;
     -*)
-      echo "Unknown option: $1"
-      echo "Use -h or --help for usage information"
+      echo "Unknown option: $1" >&2
+      usage >&2
       exit 1
       ;;
     *)
-      # This is a pattern argument
-      if [ "$current_collection_mode" = "specific" ]; then
-          target_patterns+=("$1")
-          shift
-      elif [ "$current_collection_mode" = "exclude" ]; then
-          exclude_patterns+=("$1")
-          shift
+      if [[ "$current_collection_mode" == "specific" ]]; then
+        target_patterns+=("$1")
+      elif [[ "$current_collection_mode" == "exclude" ]]; then
+        exclude_patterns+=("$1")
       else
-          echo "Error: Pattern '$1' provided but no -s or -e flag is currently active."
-          echo "Put patterns immediately after the -s or -e flag."
-          echo "Use -h for help"
-          exit 1
+        echo "Pattern '$1' must follow -s or -e." >&2
+        exit 1
       fi
+      shift
       ;;
   esac
 done
 
-
-echo "Analyzing branches..."
-
-# Calculate month ago timestamp if needed
-if [ "$old_mode" = true ]; then
-  month_ago=$(date -j -v-1m +%s)  # macOS way to get date from 1 month ago
-fi
-
-# Validate all patterns first (target and exclude)
-invalid_patterns=()
-
-# Check target patterns
-for pattern in "${target_patterns[@]}"; do
-  if ! validate_pattern "$pattern"; then
-    invalid_patterns+=("$pattern")
-  fi
-done
-
-# Check exclude patterns
-for pattern in "${exclude_patterns[@]}"; do
-  if ! validate_pattern "$pattern"; then
-    invalid_patterns+=("$pattern")
-  fi
-done
-
-# If any patterns are invalid, show error and exit
-if [ ${#invalid_patterns[@]} -gt 0 ]; then
-  echo "Error: Invalid wildcard patterns detected!"
-  echo "Wildcards (*) can only be at the beginning and/or end of patterns."
-  echo "Invalid patterns:"
-  for invalid in "${invalid_patterns[@]}"; do
-    echo "  $invalid"
-  done
-  echo ""
-  echo "Valid examples:"
-  echo "  AMB*     - matches branches starting with 'AMB'"
-  echo "  *AMB     - matches branches ending with 'AMB'"
-  echo "  *AMB*    - matches branches containing 'AMB'"
-  echo "  AMB      - matches branch named exactly 'AMB'"
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "Not in a git repository." >&2
   exit 1
 fi
 
-# ---------------------------------------------------------
-# PIPELINE STEP 1, 2, 3: Build list of branches to delete
-# ---------------------------------------------------------
+if [[ "$old_mode" == true ]]; then
+  six_months_ago="$(six_months_ago_epoch)"
+fi
+
+invalid_patterns=()
+for pattern in ${target_patterns[@]+"${target_patterns[@]}"}; do
+  validate_pattern "$pattern" || invalid_patterns+=("$pattern")
+done
+for pattern in ${exclude_patterns[@]+"${exclude_patterns[@]}"}; do
+  validate_pattern "$pattern" || invalid_patterns+=("$pattern")
+done
+
+if [[ ${#invalid_patterns[@]} -gt 0 ]]; then
+  echo "Invalid wildcard patterns:"
+  printf '  %s\n' "${invalid_patterns[@]}"
+  exit 1
+fi
+
 branches_to_delete=()
-branches_to_delete_info=() # Store display info
+branch_details=()
 
-while IFS=' ' read -r branch date; do
-  ((total_branches++))
+while IFS=' ' read -r branch epoch; do
+  total_branches=$((total_branches + 1))
 
-  # Always protect main and master
-  if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  if [[ "$branch" == "main" || "$branch" == "master" ]]; then
     continue
   fi
 
-  # STEP 1: SELECTION
-  # If -s is set, branch must match one of the target patterns
-  # If -s is NOT set, all branches are candidates (except main/master)
   is_candidate=false
-  
-  if [ "$specific_mode" = true ]; then
-    for pattern in "${target_patterns[@]}"; do
+  selection_reason=""
+
+  if [[ "$specific_mode" == true ]]; then
+    for pattern in ${target_patterns[@]+"${target_patterns[@]}"}; do
       if match_pattern "$branch" "$pattern"; then
         is_candidate=true
-        selection_reason="(matches: $pattern)"
+        selection_reason="matches: $pattern"
         break
       fi
     done
   else
     is_candidate=true
-    selection_reason=""
   fi
 
-  if [ "$is_candidate" = false ]; then
-    continue
-  fi
+  [[ "$is_candidate" == true ]] || continue
 
-  # STEP 2: EXCLUSION
-  # If -e is set, remove branch if it matches any exclude pattern
   should_exclude=false
-  if [ "$exclude_mode" = true ]; then
-    for pattern in "${exclude_patterns[@]}"; do
+  if [[ "$exclude_mode" == true ]]; then
+    for pattern in ${exclude_patterns[@]+"${exclude_patterns[@]}"}; do
       if match_pattern "$branch" "$pattern"; then
         should_exclude=true
         break
@@ -261,67 +199,96 @@ while IFS=' ' read -r branch date; do
     done
   fi
 
-  if [ "$should_exclude" = true ]; then
+  [[ "$should_exclude" == false ]] || continue
+
+  if [[ "$old_mode" == true && "$epoch" -ge "$six_months_ago" ]]; then
     continue
   fi
 
-  # STEP 3: AGE FILTER
-  # If -o is set, remove branch if it is not old enough
-  if [ "$old_mode" = true ]; then
-    if [ $date -ge $month_ago ]; then
-      # Branch is too new, skip it
-      continue
+  display_date="$(format_epoch "$epoch")"
+  branches_to_delete+=("$branch")
+
+  details=()
+  if [[ "$verbose_mode" == true && -n "$selection_reason" ]]; then
+    details+=("$selection_reason")
+  fi
+  if [[ "$old_mode" == true ]]; then
+    details+=("age: $display_date")
+  else
+    details+=("last updated: $display_date")
+  fi
+
+  branch_details+=("${details[*]}")
+done < <(git branch --sort=committerdate --format='%(refname:short) %(committerdate:unix)')
+
+if [[ ${#branches_to_delete[@]} -eq 0 ]]; then
+  echo "No matching branches found."
+  exit 0
+fi
+
+# Pad branch names so the details column lines up
+max_branch_length=0
+for branch in "${branches_to_delete[@]}"; do
+  if [[ ${#branch} -gt $max_branch_length ]]; then
+    max_branch_length=${#branch}
+  fi
+done
+
+display_lines=()
+for index in "${!branches_to_delete[@]}"; do
+  display_lines+=("$(printf '%-*s  %s' "$max_branch_length" "${branches_to_delete[$index]}" "${branch_details[$index]}")")
+done
+
+if command -v fzf >/dev/null 2>&1; then
+  # Live header: selected count updates as toggle keys are pressed
+  header_command="echo \"Deleting \$FZF_SELECT_COUNT of $total_branches branches — space to toggle, enter to confirm\""
+
+  # Pre-select every branch; space/tab deselects, enter confirms, esc cancels
+  selected_lines="$(printf '%s\n' "${display_lines[@]}" | fzf --multi --sync \
+    --layout=reverse \
+    --height='~80%' \
+    --marker='✓ ' \
+    --bind "start:select-all+transform-header:$header_command" \
+    --bind "space:toggle+down+transform-header:$header_command" \
+    --bind "tab:toggle+down+transform-header:$header_command" \
+    --bind "ctrl-a:select-all+transform-header:$header_command" \
+    --bind "ctrl-d:deselect-all+transform-header:$header_command")" || true
+
+  if [[ -z "$selected_lines" ]]; then
+    echo "Cancelled."
+    exit 0
+  fi
+
+  selected_branches=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    selected_branches+=("${line%% *}")
+  done <<< "$selected_lines"
+
+  if command -v gum >/dev/null 2>&1; then
+    if ! gum confirm "Delete ${#selected_branches[@]} branch(es)?"; then
+      echo "Cancelled."
+      exit 0
+    fi
+  else
+    read -r -p "Delete ${#selected_branches[@]} branch(es)? (y/N) " reply
+    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+      echo "Cancelled."
+      exit 0
     fi
   fi
 
-  # If we got here, the branch is selected for deletion
-  display_date=$(date -j -r $date '+%Y-%m-%d')
-  
-  branches_to_delete+=("$branch")
-  
-  # Format info string
-  info_str="Will delete: $branch"
-  details=""
-  
-  if [ "$verbose_mode" = true ] && [ -n "$selection_reason" ]; then
-    details="$selection_reason"
-  fi
-  
-  if [ "$old_mode" = true ]; then
-     if [ -n "$details" ]; then details="$details, "; fi
-     details="${details}age: $display_date"
-  else
-     if [ -n "$details" ]; then details="$details, "; fi
-     details="${details}last updated: $display_date"
-  fi
-  
-  if [ -n "$details" ]; then
-    info_str="$info_str ($details)"
-  fi
-  
-  branches_to_delete_info+=("$info_str")
-
-done < <(git branch --format="%(refname:short) %(committerdate:unix)")
-
-# ---------------------------------------------------------
-# PIPELINE STEP 4: User Confirmation
-# ---------------------------------------------------------
-
-# Display what will be deleted
-for info in "${branches_to_delete_info[@]}"; do
-  echo "$info"
-done
-
-echo -e "\nFound ${#branches_to_delete[@]} out of $total_branches branches to delete."
-read -p "Do you want to proceed? (y/n) " -n 1 -r
-echo
-
-# ---------------------------------------------------------
-# PIPELINE STEP 5: Deletion
-# ---------------------------------------------------------
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  for branch in "${branches_to_delete[@]}"; do
-     git branch -D "$branch"
+  for branch in "${selected_branches[@]}"; do
+    git branch -D "$branch"
   done
+else
+  printf '%s\n' "${display_lines[@]}"
+  printf '\nFound %s out of %s branches to delete.\n' "${#branches_to_delete[@]}" "$total_branches"
+  read -r -p "Do you want to proceed? (y/N) " reply
+
+  if [[ "$reply" =~ ^[Yy]$ ]]; then
+    for branch in "${branches_to_delete[@]}"; do
+      git branch -D "$branch"
+    done
+  fi
 fi
