@@ -299,9 +299,10 @@ link "$DOTFILES/claude/custom-commands"     "$HOME/.claude/custom-commands"
 
 cp "$DOTFILES/claude/custom-commands/.labs.example" "$HOME/.claude/custom-commands/.labs"
 
-# Scripts are sourced by .zshrc and referenced by .gitconfig aliases via
-# absolute path, so they only need to be executable — no symlink required.
-chmod +x "$DOTFILES"/scripts/*
+# No symlink or chmod needed for scripts/: .zshrc sources the .zsh ones and
+# .gitconfig aliases call the .sh ones by absolute path, and git already carries
+# the exec bit (.sh files are 100755, .zsh files 100644 since they're sourced).
+# A blanket `chmod +x scripts/*` would flip the .zsh modes and dirty the repo.
 
 # ~/.gitconfig is a real file that includes the repo one, then overrides the two
 # macOS-only settings. A plain symlink would break commits (the commit template
@@ -342,6 +343,20 @@ cat > "$HOME/.gitconfig" <<GITCONFIG
 	template = ~/dotfiles/profiles/.gitmessage
 GITCONFIG
 
+# =========================== zsh plugins ====================================
+# Antigen clones its bundles with `git clone` on the first interactive zsh
+# login — outside this script, where a failure is invisible: it leaves partial
+# state in ~/.antigen, stops retrying, and later shells come up silently with
+# no plugins. Force that install to happen here instead, after git is known
+# good, so any failure is visible now and the fix is a documented one-liner.
+# timeout guards against antigen looping on a bad cache.
+banner "Pre-installing zsh plugins (antigen clones ~11 repos)"
+if bundles="$(timeout 600 zsh -lic 'antigen list' 2>/dev/null)"; then
+  echo "  $(printf '%s\n' "$bundles" | grep -c '@') bundles installed"
+else
+  warn "antigen did not finish. Fix with:"
+  warn "  rm -rf ~/.antigen  &&  zsh -lic 'antigen list'"
+fi
 
 # =========================== Default shell ==================================
 

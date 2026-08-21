@@ -188,3 +188,158 @@ Host *
   ![Home Inventory Settings](settings/home-inventory-settings.png)
 - Run by double clicking `~/dotfiles/installers/Send-to-Home-Inventory.workflow`
 - Run `git co settings`
+
+---
+
+## Headless Linux Install (EC2, containers, remote dev boxes)
+
+`headless-install.sh` is the Linux counterpart to `osx-install.sh` — terminal
+workflow only. No GUI apps, Finicky, Raycast, fonts, iTerm profiles, or
+Docker/Postgres/Mongo. Supports Debian/Ubuntu (apt) and Amazon Linux/RHEL/Fedora
+(dnf/yum).
+
+```bash
+git clone git@github.com:jsfeb26/dotfiles.git ~/dotfiles   # must be ~/dotfiles
+bash ~/dotfiles/headless-install.sh
+exec zsh -l
+```
+
+The box gets the `amber` starship palette instead of `blue`, so it can't be
+mistaken for the Mac at a glance. Switch schemes by changing the single
+`palette = ...` line in `.config/starship.toml`; the per-machine override lives
+in the generated `~/.zshenv`.
+
+Still worth doing by hand afterwards: `gh auth login` (separate from your SSH
+key — `gh` needs its own API token).
+
+## Troubleshooting — Headless Linux
+
+### Autosuggestions aren't showing
+
+**Symptom:** typing `git` no longer shows the rest of your most recent matching
+command as grey ghost text, and right-arrow doesn't fill it in. Confirm with:
+
+```bash
+type _zsh_autosuggest_start   # "not found" means the plugin never loaded
+antigen list                  # "You don't have any bundles" is the tell
+```
+
+**Cause:** antigen installs its plugins by running `git clone` on the first
+interactive zsh login. If git is broken or the network fails at that moment,
+every clone fails, antigen leaves partial state in `~/.antigen`, and it never
+retries. Later logins then come up silently with no plugins — no error at all,
+which makes it look unrelated to whatever originally failed.
+
+**Fix:**
+
+```bash
+rm -rf ~/.antigen
+zsh -lic 'antigen list'    # should list 11 bundles and exit in ~10s
+exec zsh -l
+```
+
+Antigen has no self-repair: once its state is partial it stays partial. Any
+"plugin is installed but isn't loading" symptom starts here.
+
+### Every git command fails with `bad boolean config value 'simple'`
+
+**Symptom:** `fatal: bad boolean config value 'simple' for 'branch.autosetupmerge'`
+on *every* git command — which also silently breaks antigen (above), since its
+bundle installs are git clones.
+
+**Cause:** `profiles/.gitconfig` sets `branch.autoSetupMerge = simple`, which
+requires git >= 2.37. Ubuntu 22.04 ships 2.34 and 20.04 ships 2.25.
+
+Overriding the value in `~/.gitconfig` does **not** work. Git runs its config
+callback on every occurrence of a key in file order, so it dies parsing `simple`
+from the include before it ever reaches a later override. The key has to be
+absent, not overridden.
+
+**Fix — upgrade git:**
+
+```bash
+sudo add-apt-repository -y ppa:git-core/ppa
+sudo NEEDRESTART_MODE=a apt-get update -y
+sudo NEEDRESTART_MODE=a apt-get install -y git
+git config --global --unset branch.autoSetupMerge   # if a workaround was added
+```
+
+On distros without the `git-core` PPA, `headless-install.sh` writes
+`~/.gitconfig.compat` — a snapshot of `profiles/.gitconfig` with the unsupported
+keys stripped — and includes that instead. It does not track later edits to the
+repo config, so upgrade git and rerun the script to get rid of it.
+
+### `command not found: starship` / `fzf` on login
+
+**Symptom:** `.zshrc:21: command not found: starship`, `.zshrc:22: command not
+found: fzf`, and the default zsh prompt instead of the powerline one.
+
+**Cause:** `.zshrc` calls `starship init` and `fzf --zsh` near the top but only
+adds `~/.local/bin` to `PATH` around line 148. On macOS that's fine — brew's bin
+is already on `PATH` via `.zprofile` — but on Linux these tools live in
+`~/.local/bin`, so they're invisible for the first ~127 lines.
+
+**Fix:** `PATH` has to be set before `.zshrc` runs. `headless-install.sh`
+generates `~/.zshenv` for this; if it's missing:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshenv
+```
+
+Related: distro `fzf` is too old for `fzf --zsh` (needs >= 0.48 — Ubuntu 22.04
+ships 0.29), so the script installs it from git into `~/.fzf`.
+
+### Antigen clones in an endless loop and you can't get a usable login shell
+
+**Symptom:** every SSH login floods with `Cloning into '~/.antigen/bundles/...'`
+over and over, Ctrl-C doesn't escape, and new SSH sessions do the same thing
+immediately.
+
+**Cause:** a corrupt antigen cache that re-triggers a full install on every
+startup and never records success. Running `antigen bundle` / `antigen apply` by
+hand in an interactive shell is one way to get there.
+
+**Fix — first get a shell that never sources `.zshrc`:**
+
+```bash
+ssh <host> -t "bash --noprofile --norc"
+```
+
+Then, from that bash shell:
+
+```bash
+pkill -9 -u "$(id -un)" zsh
+pkill -9 -f 'git clone'
+sudo chsh -s /bin/bash "$(id -un)"              # make logins safe while fixing
+rm -rf ~/.antigen
+timeout 300 zsh -lic 'antigen list'             # timeout so it can't run away
+sudo chsh -s "$(command -v zsh)" "$(id -un)"    # switch back when it's clean
+```
+
+### apt opens a purple "Which services should be restarted?" dialog
+
+**Symptom:** a `Daemons using outdated libraries` dialog blocks the install.
+
+**Cause:** apt upgraded a shared library and `needrestart` wants to restart the
+affected services. It has its own frontend and ignores `DEBIAN_FRONTEND`.
+
+**Fix:** press `<Ok>` with the defaults unchanged. The risky services (`dbus`,
+`docker`, `getty`, `systemd-logind`, `user@`) are already unchecked, and
+restarting `ssh.service` will not drop your session — Ubuntu ships it with
+`KillMode=process`, so only the listener is replaced.
+
+To avoid the prompt entirely, pass `NEEDRESTART_MODE=a` (restart automatically)
+or `NEEDRESTART_SUSPEND=1` (skip restarts, reboot on your own schedule). These
+must go through `sudo env ...` or be set inline on the `sudo` command — `sudo`
+resets the environment, so an exported var never reaches apt.
+
+### Atuin asks to sync history during install
+
+Not a bug, but a decision worth making deliberately. An Atuin account is a
+single shared history pool — logging in with the same account as the Mac merges
+both machines' history in both directions.
+
+Choose `3) Skip sync for now`. Atuin is fully functional offline (local history,
+search, up-arrow), and you can `atuin login` later. For a Linux fleet, register
+a *separate* account from the Mac one and save the encryption key
+(`atuin key`) — you need it to log in on a second box.
