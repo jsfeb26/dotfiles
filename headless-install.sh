@@ -20,6 +20,13 @@ LOCAL_BIN="$HOME/.local/bin"   # .zshrc already puts this on PATH
 
 banner() { printf "\e[42m %s \e[0m\n" "$1"; }
 warn() { printf "\e[43m %s \e[0m\n" "$1"; }
+link() {
+  local src="$1" dest="$2"
+  if [ -e "$dest" ] || [ -L "$dest" ]; then
+    rm -r "$dest"
+  fi
+  ln -s "$src" "$dest"
+}
 
 if [ ! -d "$DOTFILES" ]; then
   echo "Error: expected dotfiles repo at $DOTFILES"
@@ -58,9 +65,18 @@ PKGS=(zsh git curl wget tmux vim tree jq unzip tar gzip less perl python3 \
 
 if command -v apt-get >/dev/null 2>&1; then
   PKG_MGR="apt"
-  export DEBIAN_FRONTEND=noninteractive
-  $SUDO apt-get update -y
-  $SUDO apt-get install -y build-essential python3-pip neovim ack "${PKGS[@]}"
+  # Passed through `env` rather than exported: sudo resets the environment by
+  # default, so an exported DEBIAN_FRONTEND never reaches the sudo'd apt-get.
+  #   DEBIAN_FRONTEND - suppresses debconf prompts (e.g. config file diffs)
+  #   NEEDRESTART_MODE=a - needrestart has its own frontend and ignores
+  #     DEBIAN_FRONTEND; without this it opens a blocking "which services
+  #     should be restarted?" dialog whenever apt updates a shared library.
+  #     'a' restarts automatically, same as accepting its defaults. Swap for
+  #     NEEDRESTART_SUSPEND=1 to skip restarts and reboot on your own schedule.
+  APT_ENV=(DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a)
+  $SUDO env "${APT_ENV[@]}" apt-get update -y
+  $SUDO env "${APT_ENV[@]}" apt-get install -y \
+    build-essential python3-pip neovim ack "${PKGS[@]}"
 elif command -v dnf >/dev/null 2>&1 || command -v yum >/dev/null 2>&1; then
   PKG_MGR="$(command -v dnf >/dev/null 2>&1 && echo dnf || echo yum)"
   $SUDO "$PKG_MGR" install -y gcc make python3-pip "${PKGS[@]}"
@@ -74,6 +90,40 @@ fi
 # Debian/Ubuntu ship bat as `batcat` to avoid a name clash
 if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
   ln -sf "$(command -v batcat)" "$LOCAL_BIN/bat"
+fi
+
+# =========================== Git version ====================================
+# profiles/.gitconfig uses two settings that need git >= 2.37:
+#   branch.autoSetupMerge = simple  -> older git FAILS EVERY COMMAND with
+#                                      "bad boolean config value 'simple'"
+#   push.autoSetupRemote  = true    -> silently ignored on older git
+# Ubuntu 22.04 ships 2.34 and 20.04 ships 2.25, so distro git is often too old.
+
+GIT_MIN="2.37"
+GIT_LEGACY=0
+
+git_version() { git --version | awk '{print $3}'; }
+git_too_old() {
+  [ "$(printf '%s\n%s\n' "$GIT_MIN" "$(git_version)" | sort -V | head -1)" != "$GIT_MIN" ]
+}
+
+if git_too_old; then
+  banner "Upgrading git ($(git_version) < $GIT_MIN)"
+  # The git-core PPA is Ubuntu-only; Debian/RHEL have no equivalent one-liner.
+  if [ "$PKG_MGR" = "apt" ] && grep -qs '^ID=ubuntu' /etc/os-release; then
+    $SUDO env "${APT_ENV[@]}" apt-get install -y software-properties-common
+    $SUDO env "${APT_ENV[@]}" add-apt-repository -y ppa:git-core/ppa
+    $SUDO env "${APT_ENV[@]}" apt-get update -y
+    $SUDO env "${APT_ENV[@]}" apt-get install -y git
+  fi
+fi
+
+if git_too_old; then
+  GIT_LEGACY=1
+  warn "git $(git_version) is older than $GIT_MIN — writing compatibility"
+  warn "overrides into ~/.gitconfig. Upgrade git to get 'simple'/autoSetupRemote."
+else
+  echo "  git $(git_version)"
 fi
 
 # =========================== GitHub release binaries ========================
@@ -149,7 +199,19 @@ command -v atuin >/dev/null 2>&1 || \
   curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
 banner "Installing Antigen for managing zsh plugins"
-[ -f "$HOME/antigen.zsh" ] || curl -fsSL git.io/antigen > "$HOME/antigen.zsh"
+# Fetched from source rather than the git.io short link osx-install.sh uses:
+# GitHub stopped issuing git.io links in 2022 and existing ones are on
+# borrowed time. Downloaded to a temp file first — a bare `> antigen.zsh`
+# truncates the target even when curl fails, leaving an empty file behind.
+if [ ! -s "$HOME/antigen.zsh" ]; then
+  if curl -fsSL -o "$HOME/antigen.zsh.tmp" \
+       https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh; then
+    mv "$HOME/antigen.zsh.tmp" "$HOME/antigen.zsh"
+  else
+    rm -f "$HOME/antigen.zsh.tmp"
+    warn "Failed to download antigen — .zshrc will error until this is fixed"
+  fi
+fi
 
 # =========================== Node + npm globals =============================
 
@@ -187,6 +249,14 @@ curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
+# profiles/.vimrc is symlinked to ~/.vimrc below, so PlugInstall has to run
+# after that symlink exists — otherwise vim-plug reads no Plug lines at all
+# and silently "installs" nothing.
+banner "Installing vim plugins (needs ~/.vimrc symlinked first)"
+link "$DOTFILES/profiles/.vimrc" "$HOME/.vimrc"
+vim +PlugInstall +qall
+command -v nvim >/dev/null 2>&1 && nvim +PlugInstall +qall
+
 # =========================== Symlinks =======================================
 # Done last, so that any installer above that appends to ~/.zshrc writes to a
 # throwaway file instead of dirtying profiles/.zshrc in the repo.
@@ -194,13 +264,30 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 banner "Symlinking profiles"
 mkdir -p "$HOME/.config"
 
-link() {
-  local src="$1" dest="$2"
-  if [ -e "$dest" ] || [ -L "$dest" ]; then
-    rm -r "$dest"
-  fi
-  ln -s "$src" "$dest"
-}
+# .zshrc calls `starship init` and `fzf --zsh` near the top but only adds
+# ~/.local/bin to PATH much further down (line ~148). On macOS that's fine —
+# brew's bin is already on PATH via .zprofile — but here those tools live in
+# ~/.local/bin, so PATH has to be set before .zshrc runs. .zshenv is read
+# first, and for every shell type rather than login shells only.
+banner "Writing ~/.zshenv (PATH + amber starship palette)"
+cat > "$HOME/.zshenv" <<'ZSHENV'
+# Generated by headless-install.sh
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# Warm prompt colours on this box so it can't be mistaken for the Mac.
+# .config/starship.toml is shared and says palette = 'blue'; starship has no
+# include or env override for the palette, so derive a copy with just that one
+# line swapped. Regenerated whenever the source changes, so the repo file stays
+# the single source of truth — edit it, not this copy.
+STARSHIP_SRC="$HOME/dotfiles/.config/starship.toml"
+export STARSHIP_CONFIG="$HOME/.cache/starship/linux.toml"
+if [ -f "$STARSHIP_SRC" ] && \
+   { [ ! -f "$STARSHIP_CONFIG" ] || [ "$STARSHIP_SRC" -nt "$STARSHIP_CONFIG" ]; }; then
+  mkdir -p "$(dirname "$STARSHIP_CONFIG")"
+  sed "s/^palette = .*/palette = 'amber'/" "$STARSHIP_SRC" > "$STARSHIP_CONFIG"
+fi
+ZSHENV
 
 link "$DOTFILES/profiles/.zshrc"            "$HOME/.zshrc"
 link "$DOTFILES/profiles/.vimrc"            "$HOME/.vimrc"
@@ -220,10 +307,30 @@ chmod +x "$DOTFILES"/scripts/*
 # macOS-only settings. A plain symlink would break commits (the commit template
 # points at /Users/jasonstinson) and auth (osxkeychain doesn't exist on Linux).
 banner "Writing ~/.gitconfig (includes profiles/.gitconfig)"
+
+# Which file the include points at. On git < 2.37 it can't be the repo config
+# directly: git runs its config callback on every occurrence of a key in file
+# order, so it hits branch.autoSetupMerge=simple from the include and dies in
+# git_config_bool() before ever reaching a later override. The offending keys
+# have to be absent, not overridden — so include a filtered snapshot instead.
+GIT_INCLUDE="~/dotfiles/profiles/.gitconfig"
+if [ "$GIT_LEGACY" -eq 1 ]; then
+  GIT_COMPAT="$HOME/.gitconfig.compat"
+  {
+    echo "# Generated by headless-install.sh for git $(git_version) (< $GIT_MIN)."
+    echo "# Snapshot of profiles/.gitconfig with keys that old git rejects removed."
+    echo "# It does NOT track edits to profiles/.gitconfig — upgrade git and rerun"
+    echo "# headless-install.sh to get rid of this file."
+    grep -viE '^[[:space:]]*(autoSetupMerge|autoSetupRemote)[[:space:]]*=' \
+      "$DOTFILES/profiles/.gitconfig"
+  } > "$GIT_COMPAT"
+  GIT_INCLUDE="$GIT_COMPAT"
+fi
+
 cat > "$HOME/.gitconfig" <<GITCONFIG
 # Generated by headless-install.sh — edit profiles/.gitconfig instead.
 [include]
-	path = ~/dotfiles/profiles/.gitconfig
+	path = $GIT_INCLUDE
 
 # Linux overrides for macOS-specific values in profiles/.gitconfig
 [credential]
@@ -234,6 +341,7 @@ cat > "$HOME/.gitconfig" <<GITCONFIG
 [commit]
 	template = ~/dotfiles/profiles/.gitmessage
 GITCONFIG
+
 
 # =========================== Default shell ==================================
 

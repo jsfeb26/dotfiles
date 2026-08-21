@@ -1,23 +1,75 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Switch the whole prompt colour scheme by changing this one line.
+# Defined palettes: 'blue' (default), 'amber' (for Linux/EC2 boxes).
+palette = 'blue'
+
 format = """
-[█](fg:#545874)[█](fg:#676d81)[█](fg:#868ea8)\
-[  ](bg:#a3aed2 fg:#090c0c)\
-[](bg:#769ff0 fg:#a3aed2)\
+[█](fg:edge1)[█](fg:edge2)[█](fg:edge3)\
+$os\
+[](bg:accent fg:badge_bg)\
 $directory\
-[](fg:#769ff0 bg:#394260)\
+[](fg:accent bg:vcs_bg)\
 $git_branch\
 $git_status\
-[](fg:#394260 bg:#212736)\
+[](fg:vcs_bg bg:lang_bg)\
 $nodejs\
 $rust\
 $golang\
 $php\
-[](fg:#212736 bg:#1d2230)\
+[](fg:lang_bg bg:time_bg)\
 $time\
-[ ](fg:#1d2230)\
+[ ](fg:time_bg)\
 \n$character"""
 
+# ============================ Palettes =======================================
+# Every colour the prompt uses is named here by role, so a palette can be any
+# hue without the keys lying about what they are. 'blue' reproduces the
+# original hardcoded values exactly.
+
+[palettes.blue]
+edge1 = '#545874'
+edge2 = '#676d81'
+edge3 = '#868ea8'
+badge_bg = '#a3aed2'
+badge_fg = '#090c0c'
+accent = '#769ff0'
+dir_fg = '#e3e5e5'
+vcs_bg = '#394260'
+lang_bg = '#212736'
+time_bg = '#1d2230'
+time_fg = '#a0a9cb'
+
+# Warm counterpart, unmistakable next to 'blue' at a glance.
+[palettes.amber]
+edge1 = '#74604a'
+edge2 = '#8a7157'
+edge3 = '#a8896b'
+badge_bg = '#d2b8a3'
+badge_fg = '#0c0908'
+accent = '#e8973f'
+dir_fg = '#1c1409'
+vcs_bg = '#3d2f21'
+lang_bg = '#2b211a'
+time_bg = '#241c15'
+time_fg = '#cbb6a0'
+
+[os]
+# Self-identifying glyph per machine. Macos keeps U+E711, the glyph this
+# prompt hardcoded before, so the Mac prompt is unchanged.
+disabled = false
+style = "bg:badge_bg fg:badge_fg"
+format = "[ $symbol ]($style)"
+
+[os.symbols]
+Macos = ""
+Ubuntu = "󰕈"
+Debian = "󰣚"
+Amazon = ""
+Linux = "󰌽"
+
 [directory]
-style = "fg:#e3e5e5 bg:#769ff0"
+style = "fg:dir_fg bg:accent"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -30,35 +82,35 @@ truncation_symbol = "…/"
 
 [git_branch]
 symbol = ""
-style = "bg:#394260"
-format = '[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)'
+style = "bg:vcs_bg"
+format = '[[ $symbol $branch ](fg:accent bg:vcs_bg)]($style)'
 
 [git_status]
-style = "bg:#394260"
-format = '[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)'
+style = "bg:vcs_bg"
+format = '[[($all_status$ahead_behind )](fg:accent bg:vcs_bg)]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:accent bg:lang_bg)]($style)'
 
 [rust]
 symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:accent bg:lang_bg)]($style)'
 
 [golang]
 symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:accent bg:lang_bg)]($style)'
 
 [php]
 symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:accent bg:lang_bg)]($style)'
 
 [time]
 disabled = false
 time_format = "%R" # Hour:Minute Format
-style = "bg:#1d2230"
-format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'
+style = "bg:time_bg"
+format = '[[  $time ](fg:time_fg bg:time_bg)]($style)'
