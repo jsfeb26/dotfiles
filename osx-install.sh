@@ -32,7 +32,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 printf "\e[42m Install Antigen for managing plugins \e[0m\n"
-curl -L git.io/antigen > ~/antigen.zsh
+mkdir -p ~/.zsh
+# Install command from antigen's README. If the git.io short link stops working, use
+# https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh instead
+curl -L git.io/antigen > ~/.zsh/antigen.zsh
 
 printf "\e[42m Install Tmux \e[0m\n"
 brew install tmux

@@ -203,12 +203,13 @@ banner "Installing Antigen for managing zsh plugins"
 # GitHub stopped issuing git.io links in 2022 and existing ones are on
 # borrowed time. Downloaded to a temp file first — a bare `> antigen.zsh`
 # truncates the target even when curl fails, leaving an empty file behind.
-if [ ! -s "$HOME/antigen.zsh" ]; then
-  if curl -fsSL -o "$HOME/antigen.zsh.tmp" \
+mkdir -p "$HOME/.zsh"
+if [ ! -s "$HOME/.zsh/antigen.zsh" ]; then
+  if curl -fsSL -o "$HOME/.zsh/antigen.zsh.tmp" \
        https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh; then
-    mv "$HOME/antigen.zsh.tmp" "$HOME/antigen.zsh"
+    mv "$HOME/.zsh/antigen.zsh.tmp" "$HOME/.zsh/antigen.zsh"
   else
-    rm -f "$HOME/antigen.zsh.tmp"
+    rm -f "$HOME/.zsh/antigen.zsh.tmp"
     warn "Failed to download antigen — .zshrc will error until this is fixed"
   fi
 fi

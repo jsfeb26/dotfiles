@@ -36,7 +36,7 @@ fi
 
 # Uncomment there is an error installing oh-my-zsh
 # ANTIGEN_LOG=~/antigen.log
-source ~/antigen.zsh
+source ~/.zsh/antigen.zsh
 
 antigen use oh-my-zsh
 antigen bundle zsh-users/zsh-syntax-highlighting                     # Syntax Highlighting
