@@ -86,5 +86,10 @@ module.exports = {
       match: /^https:\/\/console\.statsig\.com\/.*$/,
       browser: "Google Chrome",
     },
+    {
+      // Claude artifacts
+      match: /^https:\/\/claude\.ai\/(code\/)?artifact\/.*$/,
+      browser: "Google Chrome",
+    },
   ],
 };
