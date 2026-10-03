@@ -174,6 +174,10 @@ ccdanger() {
   claude --dangerously-skip-permissions "$@"
 }
 
+cc() {
+  claude --dangerously-skip-permissions --append-system-prompt "$(<"$HOME/dotfiles/claude/clear_concise_system_prompt.md")" "$@"
+}
+
 . "$HOME/.atuin/bin/env"
 
 eval "$(atuin init zsh)"
